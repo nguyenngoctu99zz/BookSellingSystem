@@ -1,5 +1,6 @@
 package com.example.BookSelling.model;
 
+import com.example.BookSelling.common.OrderStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -32,6 +33,6 @@ public class Order {
 
     @ManyToOne
     @JoinColumn(name = "userId")
-    Users users;
+    User user;
 
 }

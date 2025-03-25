@@ -1,5 +1,7 @@
 package com.example.BookSelling.model;
 
+import com.example.BookSelling.common.PaymentMethod;
+import com.example.BookSelling.common.PaymentStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;

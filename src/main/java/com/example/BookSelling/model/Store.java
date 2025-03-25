@@ -23,5 +23,5 @@ public class Store {
 
     @OneToOne
     @JoinColumn(name = "userId")
-    Users users;
+    User user;
 }

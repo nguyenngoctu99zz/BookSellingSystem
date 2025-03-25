@@ -19,6 +19,6 @@ public class WishList {
 
     @ManyToOne
     @JoinColumn(name = "userId")
-    Users users;
+    User user;
 
 }

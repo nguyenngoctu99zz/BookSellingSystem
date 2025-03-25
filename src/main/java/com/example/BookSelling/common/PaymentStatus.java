@@ -1,4 +1,4 @@
-package com.example.BookSelling.model;
+package com.example.BookSelling.common;
 
 public enum PaymentStatus {
     SUCCEED, PENDING, FAILED
