@@ -1,0 +1,132 @@
+-- Insert Categories
+INSERT INTO category (category_name, description) VALUES
+('Fiction', 'Imaginative works of prose'),
+('Science Fiction', 'Futuristic, scientific, and technological themes'),
+('Fantasy', 'Magic, supernatural, and mythical creatures'),
+('Mystery', 'Crime and puzzle-solving stories'),
+('Romance', 'Love and emotional relationships'),
+('Thriller', 'Suspenseful and exciting plots'),
+('Horror', 'Intended to scare or frighten'),
+('Biography', 'Non-fiction accounts of people''s lives'),
+('History', 'Records of past events'),
+('Science', 'Systematic study of the natural world'),
+('Self-Help', 'Personal improvement and motivation'),
+('Business', 'Commerce, finance, and management'),
+('Cooking', 'Food preparation and recipes'),
+('Travel', 'Descriptions of places and journeys'),
+('Art', 'Visual arts and creative expression'),
+('Poetry', 'Literary works in verse form'),
+('Drama', 'Plays and theatrical performances'),
+('Children', 'Books for young readers'),
+('Young Adult', 'Books for teenage readers'),
+('Religion', 'Spiritual beliefs and practices'),
+('Philosophy', 'Study of fundamental questions'),
+('Psychology', 'Study of the mind and behavior'),
+('Technology', 'Application of scientific knowledge'),
+('Health', 'Physical and mental well-being'),
+('Sports', 'Athletic activities and competitions'),
+('Humor', 'Comedic and amusing content'),
+('Graphic Novels', 'Storytelling through sequential art'),
+('Classics', 'Enduring works of literature'),
+('Western', 'Stories set in the American Old West'),
+('Crime', 'Fiction about criminal activities');
+
+
+
+-- Insert Books (simplified without store and wishlist references)
+INSERT INTO books (book_title, publisher, author, quantity, price, description, publish_date, created_at, is_active) VALUES
+('The Silent Patient', 'Celadon Books', 'Alex Michaelides', 50, 15.99, 'Psychological thriller about a woman who shoots her husband', '2019-02-05', NOW(), true),
+('Dune', 'Chilton Books', 'Frank Herbert', 75, 12.99, 'Epic science fiction novel set in a distant future', '1965-08-01', NOW(), true),
+('The Hobbit', 'Allen & Unwin', 'J.R.R. Tolkien', 100, 10.99, 'Fantasy novel about Bilbo Baggins'' adventure', '1937-09-21', NOW(), true),
+('Gone Girl', 'Crown Publishing', 'Gillian Flynn', 60, 14.99, 'Psychological thriller about a missing wife', '2012-06-05', NOW(), true),
+('Pride and Prejudice', 'T. Egerton', 'Jane Austen', 90, 8.99, 'Classic romance novel', '1813-01-28', NOW(), true),
+('The Shining', 'Doubleday', 'Stephen King', 55, 11.99, 'Horror novel about a haunted hotel', '1977-01-28', NOW(), true),
+('Steve Jobs', 'Simon & Schuster', 'Walter Isaacson', 40, 16.99, 'Biography of Apple co-founder', '2011-10-24', NOW(), true),
+('Sapiens', 'Harper', 'Yuval Noah Harari', 65, 13.99, 'Brief history of humankind', '2011-02-10', NOW(), true),
+('Atomic Habits', 'Avery', 'James Clear', 85, 12.99, 'Guide to building good habits', '2018-10-16', NOW(), true),
+('The Lean Startup', 'Crown Business', 'Eric Ries', 45, 14.99, 'Business book about startups', '2011-09-13', NOW(), true),
+('Salt, Fat, Acid, Heat', 'Simon & Schuster', 'Samin Nosrat', 30, 17.99, 'Cookbook and cooking guide', '2017-04-25', NOW(), true),
+('The Alchemist', 'HarperCollins', 'Paulo Coelho', 95, 9.99, 'Philosophical novel about destiny', '1988-01-01', NOW(), true),
+('1984', 'Secker & Warburg', 'George Orwell', 70, 10.99, 'Dystopian social science fiction', '1949-06-08', NOW(), true),
+('The Great Gatsby', 'Charles Scribner''s Sons', 'F. Scott Fitzgerald', 80, 8.99, 'Novel about the American Dream', '1925-04-10', NOW(), true),
+('To Kill a Mockingbird', 'J. B. Lippincott & Co.', 'Harper Lee', 75, 9.99, 'Novel about racial injustice', '1960-07-11', NOW(), true),
+('The Da Vinci Code', 'Doubleday', 'Dan Brown', 60, 12.99, 'Mystery thriller about religious history', '2003-03-18', NOW(), true),
+('The Hunger Games', 'Scholastic', 'Suzanne Collins', 85, 11.99, 'Dystopian young adult novel', '2008-09-14', NOW(), true),
+('The Girl with the Dragon Tattoo', 'Norstedts', 'Stieg Larsson', 50, 13.99, 'Crime novel about a journalist and hacker', '2005-08-01', NOW(), true),
+('The Road', 'Alfred A. Knopf', 'Cormac McCarthy', 40, 10.99, 'Post-apocalyptic novel', '2006-09-26', NOW(), true),
+('The Book Thief', 'Picador', 'Markus Zusak', 65, 11.99, 'Historical novel set in Nazi Germany', '2005-03-14', NOW(), true),
+('The Fault in Our Stars', 'Dutton Books', 'John Green', 70, 12.99, 'Young adult romance novel', '2012-01-10', NOW(), true),
+('The Martian', 'Crown', 'Andy Weir', 55, 13.99, 'Science fiction about an astronaut stranded on Mars', '2011-09-27', NOW(), true),
+('Educated', 'Random House', 'Tara Westover', 45, 14.99, 'Memoir about self-education', '2018-02-20', NOW(), true),
+('The Night Circus', 'Doubleday', 'Erin Morgenstern', 50, 12.99, 'Fantasy novel about a magical competition', '2011-09-13', NOW(), true),
+('The Handmaid''s Tale', 'McClelland and Stewart', 'Margaret Atwood', 60, 10.99, 'Dystopian novel about a theocratic society', '1985-08-01', NOW(), true),
+('The Name of the Wind', 'DAW Books', 'Patrick Rothfuss', 65, 11.99, 'Fantasy novel about a legendary wizard', '2007-03-27', NOW(), true),
+('The Goldfinch', 'Little, Brown', 'Donna Tartt', 40, 15.99, 'Coming-of-age novel about art theft', '2013-10-22', NOW(), true),
+('The Subtle Art of Not Giving a F*ck', 'HarperOne', 'Mark Manson', 75, 12.99, 'Self-help book about values', '2016-09-13', NOW(), true),
+('Where the Crawdads Sing', 'G.P. Putnam''s Sons', 'Delia Owens', 55, 13.99, 'Novel about a girl growing up in marshes', '2018-08-14', NOW(), true),
+('The Seven Husbands of Evelyn Hugo', 'Atria Books', 'Taylor Jenkins Reid', 50, 14.99, 'Historical fiction about a Hollywood star', '2017-06-13', NOW(), true);
+
+
+
+-- Insert BookCategory relationships
+INSERT INTO book_category (book_id, category_id) VALUES
+-- The Silent Patient (Mystery, Thriller)
+(1, 4), (1, 6),
+-- Dune (Science Fiction, Fantasy)
+(2, 2), (2, 3),
+-- The Hobbit (Fantasy, Fiction)
+(3, 3), (3, 1),
+-- Gone Girl (Mystery, Thriller)
+(4, 4), (4, 6),
+-- Pride and Prejudice (Romance, Classics)
+(5, 5), (5, 28),
+-- The Shining (Horror, Fiction)
+(6, 7), (6, 1),
+-- Steve Jobs (Biography, Business)
+(7, 8), (7, 12),
+-- Sapiens (History, Science)
+(8, 9), (8, 10),
+-- Atomic Habits (Self-Help, Business)
+(9, 11), (9, 12),
+-- The Lean Startup (Business, Technology)
+(10, 12), (10, 23),
+-- Salt, Fat, Acid, Heat (Cooking, Art)
+(11, 13), (11, 15),
+-- The Alchemist (Fiction, Philosophy)
+(12, 1), (12, 21),
+-- 1984 (Science Fiction, Classics)
+(13, 2), (13, 28),
+-- The Great Gatsby (Fiction, Classics)
+(14, 1), (14, 28),
+-- To Kill a Mockingbird (Fiction, Classics)
+(15, 1), (15, 28),
+-- The Da Vinci Code (Mystery, Thriller)
+(16, 4), (16, 6),
+-- The Hunger Games (Science Fiction, Young Adult)
+(17, 2), (17, 19),
+-- The Girl with the Dragon Tattoo (Crime, Mystery)
+(18, 30), (18, 4),
+-- The Road (Fiction, Science Fiction)
+(19, 1), (19, 2),
+-- The Book Thief (Historical Fiction, Young Adult)
+(20, 9), (20, 19),
+-- The Fault in Our Stars (Romance, Young Adult)
+(21, 5), (21, 19),
+-- The Martian (Science Fiction, Technology)
+(22, 2), (22, 23),
+-- Educated (Biography, Memoir)
+(23, 8), (23, 8), -- Duplicate category for demonstration
+-- The Night Circus (Fantasy, Fiction)
+(24, 3), (24, 1),
+-- The Handmaid's Tale (Science Fiction, Dystopian)
+(25, 2), (25, 1),
+-- The Name of the Wind (Fantasy, Fiction)
+(26, 3), (26, 1),
+-- The Goldfinch (Fiction, Coming-of-age)
+(27, 1), (27, 1), -- Single category for demonstration
+-- The Subtle Art... (Self-Help, Psychology)
+(28, 11), (28, 22),
+-- Where the Crawdads Sing (Fiction, Mystery)
+(29, 1), (29, 4),
+-- The Seven Husbands... (Fiction, Romance)
+(30, 1), (30, 5);
