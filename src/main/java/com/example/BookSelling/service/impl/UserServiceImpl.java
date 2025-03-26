@@ -4,12 +4,16 @@ import com.example.BookSelling.common.UserRole;
 import com.example.BookSelling.dto.request.UserCreationRequest;
 import com.example.BookSelling.dto.request.UserUpdateRequest;
 import com.example.BookSelling.dto.response.UserResponse;
+import com.example.BookSelling.exception.AppException;
+import com.example.BookSelling.exception.ErrorCode;
 import com.example.BookSelling.model.User;
 import com.example.BookSelling.repository.UserRepository;
 import com.example.BookSelling.service.UserService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -18,15 +22,15 @@ import java.util.List;
 @RequiredArgsConstructor
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@Slf4j
 public class UserServiceImpl implements UserService {
     UserRepository userRepository;
-
+    PasswordEncoder passwordEncoder;
     @Override
     public UserResponse createUser(UserCreationRequest request) {
-        // chua validate
         User user = User.builder()
                 .username(request.getUsername())
-                .password(request.getPassword())
+                .password(passwordEncoder.encode(request.getPassword()))
                 .fullName(request.getFullName())
                 .email(request.getEmail())
                 .phoneNumber(request.getPhoneNumber())
@@ -35,8 +39,18 @@ public class UserServiceImpl implements UserService {
                 .userRole(UserRole.USER)
                 .isActive(true)
                 .build();
+        if(userRepository.existsByUsername(user.getUsername())) {
+            throw new AppException(ErrorCode.USER_EXISTED);
+        }
+        if (userRepository.existsByEmail(user.getEmail())) {
+            throw new AppException(ErrorCode.EMAIL_EXISTED);
+        }
+        if(userRepository.existsByPhoneNumber(user.getPhoneNumber())) {
+            throw new AppException(ErrorCode.PHONE_NO_EXISTED);
+        }
         userRepository.save(user);
         return UserResponse.builder()
+                .userId(user.getUserId())
                 .username(user.getUsername())
                 .fullName(user.getFullName())
                 .email(user.getEmail())
