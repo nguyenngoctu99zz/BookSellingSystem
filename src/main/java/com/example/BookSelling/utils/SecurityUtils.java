@@ -18,17 +18,14 @@ public class SecurityUtils {
     }
 
     private static String extractPrincipal(Authentication authentication) {
-        if(authentication == null) return null;
+        if (authentication == null) return null;
 
-        if(authentication.getPrincipal() instanceof UserDetails userDetails) {
-            return userDetails.getUsername();
-        }
-        else if(authentication.getPrincipal() instanceof Jwt jwt) {
-            return jwt.getSubject();
-        }
-        else if (authentication.getPrincipal() instanceof  String s) {
+        if (authentication.getPrincipal() instanceof Jwt jwt) {
+            return jwt.getClaim("userId");
+        } else if (authentication.getPrincipal() instanceof String s) {
             return s;
         }
         return null;
+
     }
 }

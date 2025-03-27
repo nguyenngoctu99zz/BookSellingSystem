@@ -76,6 +76,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                         .toEpochMilli()))
                 .jwtID(UUID.randomUUID().toString())
                 .claim("ROLE", user.getUserRole())
+                .claim("userId", user.getUserId())
                 .build();
         Payload payload = new Payload(jwtClaimsSet.toJSONObject());
         JWSObject jwsObject = new JWSObject(jwsHeader, payload);
