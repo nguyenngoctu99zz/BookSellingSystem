@@ -69,7 +69,20 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserResponse> getAllUsers() {
-        return List.of();
+        return userRepository.findAll()
+                .stream()
+                .map(user -> UserResponse.builder()
+                        .userId(user.getUserId())
+                        .username(user.getUsername())
+                        .fullName(user.getFullName())
+                        .email(user.getEmail())
+                        .phoneNumber(user.getPhoneNumber())
+                        .createdAt(LocalDateTime.now())
+                        .userImage(user.getUserImage())
+                        .userRole(user.getUserRole())
+                        .isActive(true)
+                        .build())
+                .toList();
     }
 
     @Override

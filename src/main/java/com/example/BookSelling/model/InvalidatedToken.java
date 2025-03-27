@@ -6,6 +6,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 
 @Getter
 @Setter
@@ -21,7 +22,7 @@ public class InvalidatedToken {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Integer tokenID;
 
-    LocalDateTime expiryTime;
+    Date expiryTime;
 
     String token;
 

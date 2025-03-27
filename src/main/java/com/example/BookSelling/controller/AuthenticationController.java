@@ -1,9 +1,14 @@
 package com.example.BookSelling.controller;
 
 import com.example.BookSelling.dto.request.AuthenticationRequest;
+import com.example.BookSelling.dto.request.LogoutRequest;
+import com.example.BookSelling.dto.request.RefreshRequest;
 import com.example.BookSelling.dto.response.AuthenticationResponse;
+import com.example.BookSelling.dto.response.LogoutResponse;
+import com.example.BookSelling.dto.response.RefreshResponse;
 import com.example.BookSelling.dto.response.ResponseData;
 import com.example.BookSelling.service.AuthenticationService;
+import com.nimbusds.jose.JOSEException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -11,6 +16,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.text.ParseException;
 
 @RestController
 @RequestMapping("/auth")
@@ -24,6 +31,21 @@ public class AuthenticationController {
         return ResponseData.<AuthenticationResponse>builder()
                 .data(authenticationService.authenticate(request))
                 .message("Successfully logged in")
+                .build();
+    }
+    @PostMapping("log-out")
+    ResponseData<LogoutResponse> logout(@RequestBody LogoutRequest request)
+            throws ParseException, JOSEException {
+        return ResponseData.<LogoutResponse>builder()
+                .data(authenticationService.logout(request))
+                .build();
+    }
+
+    @PostMapping("refresh")
+    ResponseData<RefreshResponse> refresh(@RequestBody RefreshRequest request)
+            throws JOSEException, ParseException {
+        return ResponseData.<RefreshResponse>builder()
+                .data(authenticationService.refreshToken(request))
                 .build();
     }
 }
