@@ -87,6 +87,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         }
         return jwsObject.serialize();
     }
+
     @Override
     public LogoutResponse logout(LogoutRequest request) throws ParseException, JOSEException {
         var signedToken = verifyToken(request.getToken());
@@ -128,7 +129,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .build();
     }
 
-    private SignedJWT verifyToken(String token)
+    /// Tú: tôi sửa từ private sang public
+    public SignedJWT verifyToken(String token)
             throws ParseException, JOSEException {
         JWSVerifier verifier = new MACVerifier(SIGNER_KEY);
         SignedJWT signedJWT = SignedJWT.parse(token);
@@ -147,5 +149,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         }
         return signedJWT;
     }
+
+
 
 }

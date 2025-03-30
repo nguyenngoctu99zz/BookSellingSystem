@@ -19,7 +19,7 @@ public class OrderDiscount {
 
     @ManyToOne
     @JoinColumn(name = "orderId")
-    Order order;
+    OrderItem orderItem;
 
     @ManyToOne
     @JoinColumn(name = "discountId")

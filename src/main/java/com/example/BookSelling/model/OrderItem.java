@@ -1,8 +1,11 @@
 package com.example.BookSelling.model;
 
+import com.example.BookSelling.common.OrderStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -11,7 +14,7 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Entity
-@Table(name = "order_items")
+@Table(name = "order_items", uniqueConstraints = {} )
 public class OrderItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,11 +22,24 @@ public class OrderItem {
 
     Integer quantity;
 
-    @ManyToOne
-    @JoinColumn(name = "orderId")
-    Order order;
+    LocalDateTime orderDate;
+
+    Double totalPrice;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "order_status", length = 50)
+    private OrderStatus orderStatus;
 
     @OneToOne
+    @JoinColumn(name = "paymentId")
+    private Payment payment;
+
+    @ManyToOne
+    @JoinColumn(name = "userId")
+    User user;
+
+
+    @ManyToOne
     @JoinColumn(name = "bookId")
     Book book;
 }

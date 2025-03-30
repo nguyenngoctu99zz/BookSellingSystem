@@ -29,7 +29,14 @@ public class Book {
     String description;
     String publishDate;
     LocalDateTime createdAt;
+    @Column(columnDefinition = "TINYINT(0)")
     boolean isActive;
+    @Column(columnDefinition = "TINYINT(1)")
+    boolean isApproved;
+
+    @ManyToOne
+    @JoinColumn(name = "sellerId")
+    User user;
 
     @ManyToOne
     @JoinColumn(name = "storeId")

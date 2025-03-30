@@ -9,10 +9,13 @@ import com.example.BookSelling.exception.ErrorCode;
 import com.example.BookSelling.model.User;
 import com.example.BookSelling.repository.UserRepository;
 import com.example.BookSelling.service.UserService;
+import com.example.BookSelling.utils.SecurityUtils;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -26,6 +29,7 @@ import java.util.List;
 public class UserServiceImpl implements UserService {
     UserRepository userRepository;
     PasswordEncoder passwordEncoder;
+
     @Override
     public UserResponse createUser(UserCreationRequest request) {
         User user = User.builder()
@@ -94,4 +98,25 @@ public class UserServiceImpl implements UserService {
     public void deleteUser(int userId) {
 
     }
+
+    @Override
+    public Integer getCurrentUserId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new AppException(ErrorCode.UNAUTHENTICATED);
+        }
+
+        String username = authentication.getName();
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+
+        return user.getUserId();
+    }
+
+
+//    @Override
+//    public Integer getCurrentUserId() {
+//        return Integer.valueOf(SecurityUtils.getCurrentLogin()
+//                .orElseThrow(() -> new RuntimeException("User not authenticated")));
+//    }
 }

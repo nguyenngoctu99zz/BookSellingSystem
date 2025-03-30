@@ -32,6 +32,7 @@ public class AuthenticationController {
                 .data(authenticationService.authenticate(request))
                 .message("Successfully logged in")
                 .build();
+
     }
     @PostMapping("log-out")
     ResponseData<LogoutResponse> logout(@RequestBody LogoutRequest request)
@@ -48,4 +49,5 @@ public class AuthenticationController {
                 .data(authenticationService.refreshToken(request))
                 .build();
     }
+
 }

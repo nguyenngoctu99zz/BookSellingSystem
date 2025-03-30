@@ -12,7 +12,7 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Entity
-@Table(name = "cart_items")
+@Table(name = "cart_items", uniqueConstraints = {} )
 public class CartItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,11 +20,17 @@ public class CartItem {
 
     Integer quantity;
 
-    @ManyToOne
-    @JoinColumn(name = "cartId")
-    Cart cart;
+    Double totalPrice;
 
-    @OneToOne
+    @ManyToOne
+    @JoinColumn(name = "userId")
+    User user;
+
+//    @ManyToOne
+//    @JoinColumn(name = "cartId")
+//    Cart cart;
+
+    @ManyToOne
     @JoinColumn(name = "bookId")
     Book book;
 }
