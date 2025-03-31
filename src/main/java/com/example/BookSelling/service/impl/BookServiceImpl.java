@@ -1,6 +1,7 @@
 package com.example.BookSelling.service.impl;
 
 import com.example.BookSelling.dto.request.BookRequest;
+import com.example.BookSelling.dto.response.BookResponse;
 import com.example.BookSelling.model.Book;
 import com.example.BookSelling.model.User;
 import com.example.BookSelling.repository.BookRepository;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -22,11 +24,12 @@ import java.util.List;
 @RequiredArgsConstructor
 public class BookServiceImpl implements BookService {
 
-    private final BookRepository bookRepository;
-    private final UserRepository userRepository;
+    BookRepository bookRepository;
+    UserRepository userRepository;
+
 
     @Override
-    public Book addNewBook(Integer userId, BookRequest request) {
+    public BookResponse addNewBook(Integer userId, BookRequest request) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
@@ -45,11 +48,12 @@ public class BookServiceImpl implements BookService {
                 .user(user)
                 .build();
 
-        return bookRepository.save(book);
+        Book savedBook = bookRepository.save(book);
+        return mapToBookResponse(savedBook);
     }
 
     @Override
-    public Book updateBook(Integer bookId, BookRequest request) {
+    public BookResponse updateBook(Integer bookId, BookRequest request) {
         Book existingBook = bookRepository.findById(bookId)
                 .orElseThrow(() -> new RuntimeException("Book not found"));
 
@@ -62,37 +66,68 @@ public class BookServiceImpl implements BookService {
         existingBook.setDescription(request.getDescription());
         existingBook.setPublishDate(request.getPublishDate());
 
-        return bookRepository.save(existingBook);
+        Book updatedBook = bookRepository.save(existingBook);
+        return mapToBookResponse(updatedBook);
     }
 
     @Override
-    public Book changeBookStatus(Integer bookId, boolean isActive) {
+    public BookResponse changeBookStatus(Integer bookId, boolean isActive) {
         Book book = bookRepository.findById(bookId)
                 .orElseThrow(() -> new RuntimeException("Book not found"));
         book.setActive(isActive);
-        return bookRepository.save(book);
+        Book updatedBook = bookRepository.save(book);
+        return mapToBookResponse(updatedBook);
     }
 
     @Override
-    public List<Book> getAllBooks() {
-        return bookRepository.findAll();
+    public List<BookResponse> getAllBooks() {
+        List<Book> books = bookRepository.findAll();
+        return books.stream()
+                .map(this::mapToBookResponse)
+                .collect(Collectors.toList());
     }
 
     @Override
-    public Book getBookById(Integer bookId) {
-        return bookRepository.findById(bookId)
+    public BookResponse getBookById(Integer bookId) {
+        Book book = bookRepository.findById(bookId)
                 .orElseThrow(() -> new RuntimeException("Book not found"));
+        return mapToBookResponse(book);
     }
 
     @Override
-    public List<Book> getMyShopBooks(Integer userId) {
-        return bookRepository.findByUserUserIdAndIsApprovedTrue(userId);
+    public List<BookResponse> getMyShopBooks(Integer userId) {
+        List<Book> books = bookRepository.findByUserUserIdAndIsApprovedTrue(userId);
+        return books.stream()
+                .map(this::mapToBookResponse)
+                .collect(Collectors.toList());
     }
 
     @Override
-    public List<Book> getMyRequestBooks(Integer userId) {
-        return bookRepository.findByUserUserIdAndIsApprovedFalse(userId);
+    public List<BookResponse> getMyRequestBooks(Integer userId) {
+        List<Book> books = bookRepository.findByUserUserIdAndIsApprovedFalse(userId);
+        return books.stream()
+                .map(this::mapToBookResponse)
+                .collect(Collectors.toList());
     }
 
+    private BookResponse mapToBookResponse(Book book) {
+        return BookResponse.builder()
+                .bookId(book.getBookId())
+                .bookTitle(book.getBookTitle())
+                .publisher(book.getPublisher())
+                .author(book.getAuthor())
+                .quantity(book.getQuantity())
+                .price(book.getPrice())
+                .bookImage(book.getBookImage())
+                .description(book.getDescription())
+                .publishDate(book.getPublishDate())
+                .createdAt(book.getCreatedAt())
+                .isActive(book.isActive())
+                .isApproved(book.isApproved())
+                .sellerId(book.getUser() != null ? book.getUser().getUserId() : null)
+//                .storeId(book.getStore() != null ? book.getStore().getStoreId() : null)
+//                .wishListId(book.getWishList() != null ? book.getWishList().getWishListId() : null)
+                .build();
+    }
 
 }

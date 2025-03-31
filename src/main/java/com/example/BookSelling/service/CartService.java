@@ -1,19 +1,19 @@
 package com.example.BookSelling.service;
 
 import com.example.BookSelling.dto.request.CartItemRequest;
-import com.example.BookSelling.model.CartItem;
-import com.example.BookSelling.model.OrderItem;
-import jakarta.transaction.Transactional;
+import com.example.BookSelling.dto.response.CartItemResponse;
+import com.example.BookSelling.dto.response.OrderItemResponse;
+
 
 import java.util.List;
 
 public interface CartService{
 
-    CartItem addToCart(Integer userId, CartItemRequest request);
-    CartItem updateCartItemQuantity(Integer userId, Integer cartItemId, Integer quantity);
+    List<CartItemResponse> getCartItemsByUserId(Integer userId);
+    CartItemResponse addToCart(Integer userId, CartItemRequest request);
+    CartItemResponse updateCartItemQuantity(Integer userId, Integer cartItemId, Integer quantity);
     void removeFromCart(Integer userId, Integer cartItemId);
     void clearCart(Integer userId);
-    @Transactional
-    OrderItem checkoutSingleItem(Integer userId, Integer cartItemId);
-    List<CartItem> getCartItemsByUserId(Integer userId);
+    OrderItemResponse checkoutSingleItem(Integer userId, Integer cartItemId);
+
 }

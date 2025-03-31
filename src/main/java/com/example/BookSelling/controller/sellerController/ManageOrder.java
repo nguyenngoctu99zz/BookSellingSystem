@@ -1,14 +1,13 @@
 package com.example.BookSelling.controller.sellerController;
 
-import com.example.BookSelling.model.OrderItem;
+import com.example.BookSelling.dto.response.OrderItemResponse;
+import com.example.BookSelling.dto.response.ResponseData;
 import com.example.BookSelling.service.OrderService;
 import com.example.BookSelling.service.UserService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -21,25 +20,45 @@ public class ManageOrder {
     UserService userService;
 
     @PutMapping("/{orderItemId}/approve")
-    public ResponseEntity<OrderItem> approveOrderItem(
+    public ResponseData<OrderItemResponse> approveOrderItem(
             @PathVariable Integer orderItemId) {
         Integer currentSellerId = userService.getCurrentUserId();
-        OrderItem result = orderService.approveOrderItem(currentSellerId, orderItemId);
-        return ResponseEntity.ok(result);
+        OrderItemResponse result = orderService.approveOrderItem(currentSellerId, orderItemId);
+        return ResponseData.<OrderItemResponse>builder()
+                .message("Order approved successfully")
+                .data(result)
+                .build();
     }
 
     @PutMapping("/{orderItemId}/reject")
-    public ResponseEntity<OrderItem> rejectOrderItem(
+    public ResponseData<OrderItemResponse> rejectOrderItem(
             @PathVariable Integer orderItemId) {
         Integer currentSellerId = userService.getCurrentUserId();
-        OrderItem result = orderService.rejectOrderItem(currentSellerId, orderItemId);
-        return ResponseEntity.ok(result);
+        OrderItemResponse result = orderService.rejectOrderItem(currentSellerId, orderItemId);
+        return ResponseData.<OrderItemResponse>builder()
+                .message("Order rejected successfully")
+                .data(result)
+                .build();
     }
 
     @GetMapping("/seller/pending")
-    public ResponseEntity<List<OrderItem>> getMyPendingOrders() {
+    public ResponseData<List<OrderItemResponse>> getMyPendingOrders() {
         Integer currentSellerId = userService.getCurrentUserId();
-        List<OrderItem> result = orderService.getPendingOrdersForSeller(currentSellerId);
-        return ResponseEntity.ok(result);
+        List<OrderItemResponse> result = orderService.getPendingOrdersForSeller(currentSellerId);
+        return ResponseData.<List<OrderItemResponse>>builder()
+                .message("Pending orders retrieved successfully")
+                .data(result)
+                .build();
     }
+
+    @DeleteMapping("/cancel/{orderItemId}")
+    public ResponseData<Void> cancelOrderItem(
+            @PathVariable Integer orderItemId) {
+        Integer currentUserId = userService.getCurrentUserId();
+        orderService.cancelOrderItem(currentUserId, orderItemId);
+        return ResponseData.<Void>builder()
+                .message("Order cancelled successfully")
+                .build();
+    }
+
 }

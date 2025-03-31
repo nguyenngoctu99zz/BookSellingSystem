@@ -2,14 +2,14 @@ package com.example.BookSelling.controller.userController;
 
 
 import com.example.BookSelling.dto.request.CartItemRequest;
-import com.example.BookSelling.model.CartItem;
-import com.example.BookSelling.model.OrderItem;
+import com.example.BookSelling.dto.response.CartItemResponse;
+import com.example.BookSelling.dto.response.OrderItemResponse;
+import com.example.BookSelling.dto.response.ResponseData;
 import com.example.BookSelling.service.CartService;
 import com.example.BookSelling.service.UserService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,50 +23,58 @@ public class CartController {
     UserService userService;
 
     @GetMapping("/my-cart")
-    public ResponseEntity<List<CartItem>> showMyCart() {
-        Integer currentUserId = userService.getCurrentUserId();
-        List<CartItem> result = cartService.getCartItemsByUserId(currentUserId);
-        return ResponseEntity.ok(result);
+    public ResponseData<List<CartItemResponse>> showMyCart() {
+        return ResponseData.<List<CartItemResponse>>builder()
+                .data(cartService.getCartItemsByUserId(userService.getCurrentUserId()))
+                .message("Get cart successfully")
+                .build();
     }
 
-
     @PostMapping("/add-cart")
-    public ResponseEntity<CartItem> addToCart(@RequestBody CartItemRequest request) {
-        Integer currentUserId = userService.getCurrentUserId();
-
-        CartItem result = cartService.addToCart(currentUserId, request);
-        return ResponseEntity.ok(result);
+    public ResponseData<CartItemResponse> addToCart(@RequestBody CartItemRequest request) {
+        return ResponseData.<CartItemResponse>builder()
+                .data(cartService.addToCart(userService.getCurrentUserId(), request))
+                .message("Add to cart successfully")
+                .build();
     }
 
     @PutMapping("/update-quantity/{cartItemId}")
-    public ResponseEntity<CartItem> updateCartItemQuantity(
+    public ResponseData<CartItemResponse> updateCartItemQuantity(
             @PathVariable Integer cartItemId,
             @RequestParam Integer quantity) {
-        Integer currentUserId = userService.getCurrentUserId();
-        CartItem result = cartService.updateCartItemQuantity(currentUserId, cartItemId, quantity);
-        return ResponseEntity.ok(result);
+        return ResponseData.<CartItemResponse>builder()
+                .data(cartService.updateCartItemQuantity(
+                        userService.getCurrentUserId(),
+                        cartItemId,
+                        quantity))
+                .message("Update quantity successfully")
+                .build();
     }
 
     @DeleteMapping("/remove-item/{cartItemId}")
-    public ResponseEntity<Void> removeFromCart(@PathVariable Integer cartItemId) {
-        Integer currentUserId = userService.getCurrentUserId();
-        cartService.removeFromCart(currentUserId, cartItemId);
-        return ResponseEntity.noContent().build();
+    public ResponseData<Void> removeFromCart(@PathVariable Integer cartItemId) {
+        cartService.removeFromCart(userService.getCurrentUserId(), cartItemId);
+        return ResponseData.<Void>builder()
+                .message("Remove item successfully")
+                .build();
     }
 
     @DeleteMapping("/clear")
-    public ResponseEntity<Void> clearCart() {
-        Integer currentUserId = userService.getCurrentUserId();
-        cartService.clearCart(currentUserId);
-        return ResponseEntity.noContent().build();
+    public ResponseData<Void> clearCart() {
+        cartService.clearCart(userService.getCurrentUserId());
+        return ResponseData.<Void>builder()
+                .message("Clear cart successfully")
+                .build();
     }
 
     @PostMapping("/checkout/{cartItemId}")
-    public ResponseEntity<OrderItem> checkoutSingleItem(
+    public ResponseData<OrderItemResponse> checkoutSingleItem(
             @PathVariable Integer cartItemId) {
-        Integer currentUserId = userService.getCurrentUserId();
-        OrderItem orderItem = cartService.checkoutSingleItem(currentUserId, cartItemId);
-        return ResponseEntity.ok(orderItem);
+        return ResponseData.<OrderItemResponse>builder()
+                .data(cartService.checkoutSingleItem(
+                        userService.getCurrentUserId(),
+                        cartItemId))
+                .message("Checkout successfully")
+                .build();
     }
-
 }
