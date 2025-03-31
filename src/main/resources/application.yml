@@ -25,6 +25,6 @@ spring:
       max-request-size: 10MB
 
 jwt:
-  signer-key: "876c636cd85ac1577677ebd265dae05374ff2e8f6caa8179e77ee059058b35607bb7d2e7b816638390cdcdf05cd68a96da511f6db192ca7677cd2f0fdb1f02ed"
+  signer-key:
   valid-duration: 3600 #in seconds
   refresh-duration: 36000 # in seconds
