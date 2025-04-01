@@ -29,6 +29,7 @@ public class Book {
     String description;
     String publishDate;
     LocalDateTime createdAt;
+    double discountPercentage;
     @Column(columnDefinition = "TINYINT(0)")
     boolean isActive;
     @Column(columnDefinition = "TINYINT(1)")
@@ -42,7 +43,4 @@ public class Book {
     @JoinColumn(name = "storeId")
     Store store;
 
-    @ManyToOne
-    @JoinColumn(name = "wishListId")
-    WishList wishList;
 }

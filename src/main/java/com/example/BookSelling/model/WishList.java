@@ -20,5 +20,7 @@ public class WishList {
     @ManyToOne
     @JoinColumn(name = "userId")
     User user;
-
+    @ManyToOne
+    @JoinColumn(name = "bookId")
+    Book book;
 }

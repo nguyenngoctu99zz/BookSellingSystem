@@ -27,4 +27,8 @@ public class Payment {
     @Enumerated(EnumType.STRING)
     @Column(name = "payment_status")
     PaymentStatus paymentStatus;
+
+    double paymentAmount;
+    String orderInfo;
+    String payDate;
 }
