@@ -1,13 +1,13 @@
 package com.example.BookSelling.controller.userController;
 
 import com.example.BookSelling.dto.request.OrderItemRequest;
-import com.example.BookSelling.model.OrderItem;
+import com.example.BookSelling.dto.response.OrderItemResponse;
+import com.example.BookSelling.dto.response.ResponseData;
 import com.example.BookSelling.service.OrderService;
 import com.example.BookSelling.service.UserService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,34 +22,40 @@ public class OrderController {
     UserService userService;
 
     @GetMapping("/my-orders")
-    public ResponseEntity<List<OrderItem>> showMyOrder() {
+    public ResponseData<List<OrderItemResponse>> showMyOrder() {
         Integer currentUserId = userService.getCurrentUserId();
-        List<OrderItem> result = orderService.getOrdersByUserId(currentUserId);
-        return ResponseEntity.ok(result);
+        return ResponseData.<List<OrderItemResponse>>builder()
+                .data(orderService.getOrdersByUserId(currentUserId))
+                .message("Get orders successfully")
+                .build();
     }
 
     @PostMapping
-    public ResponseEntity<OrderItem> addToOrder(@RequestBody OrderItemRequest request) {
+    public ResponseData<OrderItemResponse> addToOrder(@RequestBody OrderItemRequest request) {
         Integer currentUserId = userService.getCurrentUserId();
-        OrderItem result = orderService.addToOrder(currentUserId, request);
-        return ResponseEntity.ok(result);
+        return ResponseData.<OrderItemResponse>builder()
+                .data(orderService.addToOrder(currentUserId, request))
+                .message("Add to order successfully")
+                .build();
     }
 
-
     @PutMapping("/update-quantity/{orderItemId}")
-    public ResponseEntity<OrderItem> updateOrderItemQuantity(
+    public ResponseData<OrderItemResponse> updateOrderItemQuantity(
             @PathVariable Integer orderItemId,
             @RequestParam Integer quantity) {
         Integer currentUserId = userService.getCurrentUserId();
-        OrderItem result = orderService.updateOrderItemQuantity(currentUserId, orderItemId, quantity);
-        return ResponseEntity.ok(result);
+        return ResponseData.<OrderItemResponse>builder()
+                .data(orderService.updateOrderItemQuantity(currentUserId, orderItemId, quantity))
+                .message("Update quantity successfully")
+                .build();
     }
 
     @DeleteMapping("/cancel/{orderItemId}")
-    public ResponseEntity<Void> cancelOrderItem(@PathVariable Integer orderItemId) {
+    public ResponseData<Void> cancelOrderItem(@PathVariable Integer orderItemId) {
         Integer currentUserId = userService.getCurrentUserId();
         orderService.cancelOrderItem(currentUserId, orderItemId);
-        return ResponseEntity.noContent().build();
+        return ResponseData.<Void>builder()
+                .message("Cancel order successfully")
+                .build();
     }
-
 }

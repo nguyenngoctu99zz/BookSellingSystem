@@ -26,9 +26,6 @@ public class CartItem {
     @JoinColumn(name = "userId")
     User user;
 
-//    @ManyToOne
-//    @JoinColumn(name = "cartId")
-//    Cart cart;
 
     @ManyToOne
     @JoinColumn(name = "bookId")

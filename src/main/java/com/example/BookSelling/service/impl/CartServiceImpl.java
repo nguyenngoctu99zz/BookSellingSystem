@@ -2,6 +2,8 @@ package com.example.BookSelling.service.impl;
 
 import com.example.BookSelling.common.OrderStatus;
 import com.example.BookSelling.dto.request.CartItemRequest;
+import com.example.BookSelling.dto.response.CartItemResponse;
+import com.example.BookSelling.dto.response.OrderItemResponse;
 import com.example.BookSelling.exception.AppException;
 import com.example.BookSelling.exception.ErrorCode;
 import com.example.BookSelling.model.Book;
@@ -19,9 +21,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Slf4j
 @Service
@@ -34,35 +41,50 @@ public class CartServiceImpl implements CartService {
 
     @Override
     @Transactional
-    public CartItem addToCart(Integer userId, CartItemRequest request) {
+    public List<CartItemResponse> getCartItemsByUserId(Integer userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+
+        List<CartItem> cartItems = cartItemRepository.findByUser(user);
+
+        return cartItems.stream()
+                .map(this::mapToCartItemResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional
+    public CartItemResponse addToCart(Integer userId, CartItemRequest request) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         Book book = bookRepository.findById(request.getBookId())
                 .orElseThrow(() -> new RuntimeException("Book not found"));
 
-        CartItem existingCartItem = cartItemRepository.findByUserAndBook(user, book)
-                .orElse(null);
+        Optional<CartItem> existingCartItemOpt = cartItemRepository.findByUserAndBook(user, book);
 
-        if (existingCartItem != null) {
+        if (existingCartItemOpt.isPresent()) {
+            CartItem existingCartItem = existingCartItemOpt.get();
             existingCartItem.setQuantity(existingCartItem.getQuantity() + request.getQuantity());
             existingCartItem.setTotalPrice(calculateTotalPrice(existingCartItem));
-            return cartItemRepository.save(existingCartItem);
+            CartItem savedItem = cartItemRepository.save(existingCartItem);
+            return mapToCartItemResponse(savedItem);
         }
 
         CartItem cartItem = CartItem.builder()
                 .user(user)
                 .book(book)
                 .quantity(request.getQuantity())
+                .totalPrice(calculateTotalPrice(book, request.getQuantity()))
                 .build();
 
-        cartItem.setTotalPrice(calculateTotalPrice(cartItem));
-        return cartItemRepository.save(cartItem);
+        CartItem savedItem = cartItemRepository.save(cartItem);
+        return mapToCartItemResponse(savedItem);
     }
 
     @Override
     @Transactional
-    public CartItem updateCartItemQuantity(Integer userId, Integer cartItemId, Integer quantity) {
+    public CartItemResponse updateCartItemQuantity(Integer userId, Integer cartItemId, Integer quantity) {
         CartItem cartItem = cartItemRepository.findById(cartItemId)
                 .orElseThrow(() -> new RuntimeException("Cart item not found"));
 
@@ -72,7 +94,8 @@ public class CartServiceImpl implements CartService {
 
         cartItem.setQuantity(quantity);
         cartItem.setTotalPrice(calculateTotalPrice(cartItem));
-        return cartItemRepository.save(cartItem);
+        CartItem savedItem = cartItemRepository.save(cartItem);
+        return mapToCartItemResponse(savedItem);
     }
 
     @Override
@@ -97,14 +120,9 @@ public class CartServiceImpl implements CartService {
         cartItemRepository.deleteAllByUser(user);
     }
 
-    private double calculateTotalPrice(CartItem cartItem) {
-        return cartItem.getBook().getPrice() * cartItem.getQuantity();
-    }
-
-
     @Override
     @Transactional
-    public OrderItem checkoutSingleItem(Integer userId, Integer cartItemId) {
+    public OrderItemResponse checkoutSingleItem(Integer userId, Integer cartItemId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
@@ -121,22 +139,44 @@ public class CartServiceImpl implements CartService {
                 .quantity(cartItem.getQuantity())
                 .orderDate(LocalDateTime.now())
                 .orderStatus(OrderStatus.PENDING)
-                .totalPrice(cartItem.getBook().getPrice() * cartItem.getQuantity())
+                .totalPrice(cartItem.getTotalPrice())
                 .build();
 
         OrderItem savedOrderItem = orderItemRepository.save(orderItem);
-
         cartItemRepository.delete(cartItem);
 
-        return savedOrderItem;
+        return mapToOrderItemResponse(savedOrderItem);
     }
 
-    @Override
-    public List<CartItem> getCartItemsByUserId(Integer userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+    private double calculateTotalPrice(CartItem cartItem) {
+        return cartItem.getBook().getPrice() * cartItem.getQuantity();
+    }
 
-        return cartItemRepository.findByUser(user);
+    private double calculateTotalPrice(Book book, Integer quantity) {
+        return book.getPrice() * quantity;
+    }
+
+    private CartItemResponse mapToCartItemResponse(CartItem cartItem) {
+        return CartItemResponse.builder()
+                .cartItemId(cartItem.getCartItemId())
+                .bookId(cartItem.getBook().getBookId())
+                .bookTitle(cartItem.getBook().getBookTitle())
+                .bookPrice(BigDecimal.valueOf(cartItem.getBook().getPrice()))
+                .quantity(cartItem.getQuantity())
+                .totalPrice(BigDecimal.valueOf(cartItem.getTotalPrice()))
+                .build();
+    }
+
+    private OrderItemResponse mapToOrderItemResponse(OrderItem orderItem) {
+        return OrderItemResponse.builder()
+                .orderItemId(orderItem.getOrderItemId())
+                .bookId(orderItem.getBook().getBookId())
+                .bookTitle(orderItem.getBook().getBookTitle())
+                .quantity(orderItem.getQuantity())
+                .orderDate(orderItem.getOrderDate())
+                .orderStatus(orderItem.getOrderStatus())
+                .totalPrice(BigDecimal.valueOf(orderItem.getTotalPrice()))
+                .build();
     }
 
 }

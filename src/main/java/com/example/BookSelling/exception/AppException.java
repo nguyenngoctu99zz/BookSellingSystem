@@ -12,5 +12,8 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 public class AppException extends RuntimeException {
     ErrorCode errorCode;
+
+    public AppException(String notEnoughQuantityAvailable) {
+    }
 }
 

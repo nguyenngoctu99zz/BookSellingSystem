@@ -1,19 +1,26 @@
 package com.example.BookSelling.service;
 
 import com.example.BookSelling.dto.request.BookRequest;
+
 import com.example.BookSelling.dto.response.NewBookByPageResponse;
 import com.example.BookSelling.dto.response.SearchBookResponse;
+
+import com.example.BookSelling.dto.response.BookResponse;
+
 import com.example.BookSelling.model.Book;
 
 import java.util.List;
 
 public interface BookService {
 
-    Book addNewBook(Integer userId, BookRequest request);
-    Book updateBook(Integer bookId, BookRequest request);
-    Book changeBookStatus(Integer bookId, boolean isActive);
-    List<Book> getAllBooks();
-    Book getBookById(Integer bookId);
+    BookResponse addNewBook(Integer userId, BookRequest request);
+    BookResponse updateBook(Integer bookId, BookRequest request);
+    BookResponse changeBookStatus(Integer bookId, boolean isActive);
+    List<BookResponse> getAllBooks();
+    BookResponse getBookById(Integer bookId);
+    List<BookResponse> getMyShopBooks(Integer userId);
+    List<BookResponse> getMyRequestBooks(Integer userId);
+
 
 
 
@@ -28,4 +35,5 @@ public interface BookService {
     public List<Book> getBestDiscountBook(int pageNumber, int numberOfbookEachPage);
     public NewBookByPageResponse bestDiscountBookHandler(int pageNumber, int numberOfBookEachPage);
     public SearchBookResponse searchBookHandler(String keyword);
+
 }
