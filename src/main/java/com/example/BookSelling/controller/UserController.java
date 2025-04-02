@@ -25,12 +25,28 @@ public class UserController {
     public UserResponse createUser(@RequestBody UserCreationRequest request){
         return userService.createUser(request);
     }
+
     @GetMapping("")
     public ResponseData<List<UserResponse>> getAllUsers(){
         return ResponseData.<List<UserResponse>>builder()
+                .code(200)
                 .data(userService.getAllUsers())
                 .message("Successfully retrieved all users")
                 .build();
     }
 
+    @GetMapping("/{userId}")
+    public ResponseData<UserResponse> getUserById(@PathVariable int userId){
+        return ResponseData.<UserResponse>builder()
+                .code(200)
+                .data(userService.getUserById(userId))
+                .message("Successfully retrieved user")
+                .build();
+    }
+
+    @DeleteMapping("/{userId}")
+    public void deleteUser(@PathVariable int userId){
+
+        userService.deleteUser(userId);
+    }
 }

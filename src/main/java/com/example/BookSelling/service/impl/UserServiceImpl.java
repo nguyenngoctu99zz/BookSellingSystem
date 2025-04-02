@@ -7,9 +7,10 @@ import com.example.BookSelling.dto.response.UserResponse;
 import com.example.BookSelling.exception.AppException;
 import com.example.BookSelling.exception.ErrorCode;
 import com.example.BookSelling.model.User;
+import com.example.BookSelling.repository.InvalidatedTokenRepository;
 import com.example.BookSelling.repository.UserRepository;
 import com.example.BookSelling.service.UserService;
-import com.example.BookSelling.utils.SecurityUtils;
+import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -29,9 +30,11 @@ import java.util.List;
 public class UserServiceImpl implements UserService {
     UserRepository userRepository;
     PasswordEncoder passwordEncoder;
-
+    InvalidatedTokenRepository invalidatedTokenRepository;
     @Override
     public UserResponse createUser(UserCreationRequest request) {
+        var role = (request.getUserRole() != null) ?
+                request.getUserRole() : UserRole.USER;
         User user = User.builder()
                 .username(request.getUsername())
                 .password(passwordEncoder.encode(request.getPassword()))
@@ -40,7 +43,7 @@ public class UserServiceImpl implements UserService {
                 .phoneNumber(request.getPhoneNumber())
                 .createdAt(LocalDateTime.now())
 //                .userImage(request.getUserImage())
-                .userRole(UserRole.USER)
+                .userRole(role)
                 .isActive(true)
                 .build();
         if(userRepository.existsByUsername(user.getUsername())) {
@@ -67,8 +70,26 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserResponse updateUser(UserUpdateRequest request) {
-        return null;
+    public UserResponse updateUser(int userId, UserUpdateRequest request) {
+        var user = userRepository.findById(userId)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+
+        user.setUsername(request.getUsername());
+        user.setFullName(request.getFullName());
+        user.setEmail(request.getEmail());
+        user.setPhoneNumber(request.getPhoneNumber());
+        user.setUserImage(request.getUserImage());
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        userRepository.save(user);
+
+        return UserResponse.builder()
+                .userId(user.getUserId())
+                .username(user.getUsername())
+                .fullName(user.getFullName())
+                .email(user.getEmail())
+                .phoneNumber(user.getPhoneNumber())
+                .userImage(user.getUserImage())
+                .build();
     }
 
     @Override
@@ -91,12 +112,35 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponse getUserById(int userId) {
-        return null;
+        var user = userRepository.findById(userId)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        return UserResponse.builder()
+                .userId(user.getUserId())
+                .username(user.getUsername())
+                .fullName(user.getFullName())
+                .email(user.getEmail())
+                .phoneNumber(user.getPhoneNumber())
+                .createdAt(LocalDateTime.now())
+                .userImage(user.getUserImage())
+                .userRole(user.getUserRole())
+                .isActive(true)
+                .build();
     }
 
     @Override
+    @Transactional
     public void deleteUser(int userId) {
+        var user = userRepository.findById(userId)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        invalidatedTokenRepository.deleteByUser(user);
+        userRepository.delete(user);
+    }
 
+    @Override
+    public void softDeleteUser(int userId) {
+        var user = userRepository.findById(userId)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        user.setActive(false);
     }
 
     @Override

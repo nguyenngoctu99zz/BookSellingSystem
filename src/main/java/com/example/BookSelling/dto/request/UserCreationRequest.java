@@ -21,4 +21,5 @@ public class UserCreationRequest {
 //    String userImage;
     LocalDateTime createdAt;
     boolean isActive;
+    UserRole userRole;
 }
