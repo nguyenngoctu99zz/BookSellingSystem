@@ -1,5 +1,6 @@
 package com.example.BookSelling.service.impl;
 
+import com.example.BookSelling.common.UserRole;
 import com.example.BookSelling.dto.request.BookRequest;
 
 import com.example.BookSelling.dto.response.NewBookByPageResponse;
@@ -157,6 +158,26 @@ public class BookServiceImpl implements BookService {
         List<Book> books = bookRepository.searchBookByKeyWord(keyword);
         SearchBookResponse searchBookResponse = new SearchBookResponse(books,books.size());
         return searchBookResponse;
+
+    @Override
+    public BookResponse approveBook(Integer bookId, Integer adminId) {
+        User admin = userRepository.findById(adminId)
+                .orElseThrow(() -> new RuntimeException("Admin not found"));
+
+        if (!admin.getUserRole().equals(UserRole.ADMIN)) {
+            throw new RuntimeException("Permission denied: Only admin can approve books.");
+        }
+
+        var book = bookRepository.findById(bookId)
+                .orElseThrow(() -> new RuntimeException("Book not found"));
+
+        book.setApproved(true);
+        book.setActive(true);
+
+        Book approvedBook = bookRepository.save(book);
+        return mapToBookResponse(approvedBook);
+    }
+
 
     private BookResponse mapToBookResponse(Book book) {
         return BookResponse.builder()

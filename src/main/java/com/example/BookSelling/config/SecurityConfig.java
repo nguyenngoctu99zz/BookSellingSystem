@@ -28,8 +28,10 @@ public class SecurityConfig {
     private static final String[] White_List = {
             "/auth/**",
             "/users",
+            "admin/books/**",
             "/books",
-            "/books/{id}"
+            "/books/{id}",
+            "/reviews/**"
     };
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
