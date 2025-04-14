@@ -8,17 +8,21 @@ import com.example.BookSelling.model.Payment;
 import com.example.BookSelling.repository.PaymentRepository;
 import com.example.BookSelling.service.PaymentService;
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
 @Service
+@RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class PaymentServiceImpl implements PaymentService {
-    @Autowired
+
     PaymentRepository paymentRepository;
-    @Autowired
     VNPayService vnPayService;
+
     @Override
     public ResponseEntity<PaymentResponse> paymentHandler(PaymentSubmitRequest paymentSubmitRequest, HttpServletRequest request) {
         if(paymentSubmitRequest.getPaymentMethod() == PaymentMethod.COD){
@@ -32,7 +36,7 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
         String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + "/api/v1/api/payment";
-        String vnpayUrl = vnPayService.createOrder(request, paymentSubmitRequest.getAmount(), paymentSubmitRequest.getOrderInfo(), baseUrl);
+        String vnpayUrl = vnPayService.createOrder(request, (int) paymentSubmitRequest.getAmount(), paymentSubmitRequest.getOrderInfo(), baseUrl);
         return ResponseEntity.ok().body(new PaymentResponse("redirect:" + vnpayUrl));
     }
 }

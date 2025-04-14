@@ -56,10 +56,10 @@ public class CartServiceImpl implements CartService {
     @Transactional
     public CartItemResponse addToCart(Integer userId, CartItemRequest request) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
         Book book = bookRepository.findById(request.getBookId())
-                .orElseThrow(() -> new RuntimeException("Book not found"));
+                .orElseThrow(() -> new AppException(ErrorCode.BOOK_NOT_FOUND));
 
         Optional<CartItem> existingCartItemOpt = cartItemRepository.findByUserAndBook(user, book);
 
@@ -89,7 +89,7 @@ public class CartServiceImpl implements CartService {
                 .orElseThrow(() -> new RuntimeException("Cart item not found"));
 
         if (!cartItem.getUser().getUserId().equals(userId)) {
-            throw new RuntimeException("Unauthorized");
+            throw new AppException(ErrorCode.UNAUTHORIZED);
         }
 
         cartItem.setQuantity(quantity);
@@ -105,7 +105,7 @@ public class CartServiceImpl implements CartService {
                 .orElseThrow(() -> new RuntimeException("Cart item not found"));
 
         if (!cartItem.getUser().getUserId().equals(userId)) {
-            throw new RuntimeException("Unauthorized");
+            throw new AppException(ErrorCode.UNAUTHORIZED);
         }
 
         cartItemRepository.delete(cartItem);
@@ -115,7 +115,7 @@ public class CartServiceImpl implements CartService {
     @Transactional
     public void clearCart(Integer userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
         cartItemRepository.deleteAllByUser(user);
     }

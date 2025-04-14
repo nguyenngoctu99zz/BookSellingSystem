@@ -24,16 +24,12 @@ public interface BookService {
 
 
 
-    List<Book> getMyShopBooks(Integer userId);
-
-    List<Book> getMyRequestBooks(Integer userId);
-
-    public List<Book> getNewestBookInPage(int pageNumber, int numberOfBookEachPage);
-    public NewBookByPageResponse newBookPageHandler(int pageNumber, int numberOfBookEachPage);
-    public List<Book> getBestReviewBook(int pageNumber,int numberOfBookEachPage);
-    public NewBookByPageResponse bestReviewBookHandler(int pageNumber, int numberOfBookEachPage);
-    public List<Book> getBestDiscountBook(int pageNumber, int numberOfbookEachPage);
-    public NewBookByPageResponse bestDiscountBookHandler(int pageNumber, int numberOfBookEachPage);
-    public SearchBookResponse searchBookHandler(String keyword);
+    List<Book> getNewestBookInPage(int pageNumber, int numberOfBookEachPage);
+    NewBookByPageResponse newBookPageHandler(int pageNumber, int numberOfBookEachPage);
+    List<Book> getBestReviewBook(int pageNumber,int numberOfBookEachPage);
+    NewBookByPageResponse bestReviewBookHandler(int pageNumber, int numberOfBookEachPage);
+    List<Book> getBestDiscountBook(int pageNumber, int numberOfbookEachPage);
+    NewBookByPageResponse bestDiscountBookHandler(int pageNumber, int numberOfBookEachPage);
+    SearchBookResponse searchBookHandler(String keyword);
 
 }

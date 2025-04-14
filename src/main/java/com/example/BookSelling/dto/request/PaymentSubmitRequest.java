@@ -13,5 +13,5 @@ import lombok.Setter;
 public class PaymentSubmitRequest {
     private PaymentMethod paymentMethod;
     private String orderInfo;
-    private int amount;
+    private double amount;
 }

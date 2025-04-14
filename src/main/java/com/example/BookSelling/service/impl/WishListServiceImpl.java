@@ -6,22 +6,24 @@ import com.example.BookSelling.repository.UserRepository;
 import com.example.BookSelling.repository.WishListRepository;
 import com.example.BookSelling.service.UserService;
 import com.example.BookSelling.service.WishListService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class WishListServiceImpl implements WishListService {
-    @Autowired
-WishListRepository wishListRepository;
-    @Autowired
+
+    WishListRepository wishListRepository;
     UserRepository userRepository;
-    @Autowired
     BookRepository bookRepository;
-    @Autowired
     UserService userService;
+
     @Override
     public ResponseEntity<List<WishList>> getBookInWishList() {
         int userId = userService.getCurrentUserId();
@@ -43,11 +45,12 @@ WishListRepository wishListRepository;
         return ResponseEntity.ok().body("add success");
     }
 
+
     @Override
     public ResponseEntity<String> deleteWishList(int bookId) {
         int userId = userService.getCurrentUserId();
             wishListRepository.deleteByBookAndUser(bookId,userId);
-        return ResponseEntity.ok().body("add success");
+        return ResponseEntity.ok().body("success");
     }
 
 }

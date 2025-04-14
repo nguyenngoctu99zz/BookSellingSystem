@@ -1,5 +1,6 @@
 package com.example.BookSelling.service.impl;
 
+import com.example.BookSelling.common.UserRole;
 import com.example.BookSelling.dto.request.AuthenticationRequest;
 import com.example.BookSelling.dto.request.LogoutRequest;
 import com.example.BookSelling.dto.request.RefreshRequest;
@@ -30,6 +31,7 @@ import java.text.ParseException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
+import java.util.StringJoiner;
 import java.util.UUID;
 
 @RequiredArgsConstructor
@@ -75,7 +77,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                         .plus(VALID_DURATION, ChronoUnit.SECONDS)
                         .toEpochMilli()))
                 .jwtID(UUID.randomUUID().toString())
-                .claim("ROLE", user.getUserRole())
+                .claim("roles", buildRole(user))
                 .claim("userId", user.getUserId())
                 .build();
         Payload payload = new Payload(jwtClaimsSet.toJSONObject());
@@ -87,7 +89,14 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         }
         return jwsObject.serialize();
     }
-
+    private String buildRole(User user) {
+        StringJoiner stringJoiner = new StringJoiner(" ");
+        UserRole userRole = user.getUserRole();
+        if(userRole != null) {
+            stringJoiner.add(user.getUserRole().toString());
+        }
+        return "ROLE_" + stringJoiner;
+    }
     @Override
     public LogoutResponse logout(LogoutRequest request) throws ParseException, JOSEException {
         var signedToken = verifyToken(request.getToken());

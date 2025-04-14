@@ -8,21 +8,24 @@ import com.example.BookSelling.repository.PaymentRepository;
 import com.example.BookSelling.service.PaymentService;
 import com.example.BookSelling.service.impl.VNPayService;
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/payment")
+@RequestMapping("/payment")
+@RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class PaymentController {
-    @Autowired
-    private PaymentRepository paymentRepository;
-    @Autowired
-    private VNPayService vnPayService;
-    @Autowired
-    private PaymentService paymentService;
+
+    PaymentRepository paymentRepository;
+    VNPayService vnPayService;
+    PaymentService paymentService;
+
     @PostMapping("/submitOrder")
-    public ResponseEntity<PaymentResponse> submidOrder(@RequestBody PaymentSubmitRequest paymentSubmitRequest, HttpServletRequest request){
+    public ResponseEntity<PaymentResponse> submitOrder(@RequestBody PaymentSubmitRequest paymentSubmitRequest, HttpServletRequest request){
              return paymentService.paymentHandler(paymentSubmitRequest,request);
     }
 

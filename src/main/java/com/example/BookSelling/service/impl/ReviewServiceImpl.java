@@ -6,20 +6,20 @@ import com.example.BookSelling.dto.response.BookReviewResponse;
 import com.example.BookSelling.dto.response.ReviewResponse;
 import com.example.BookSelling.exception.AppException;
 import com.example.BookSelling.exception.ErrorCode;
-import com.example.BookSelling.model.Book;
 import com.example.BookSelling.model.Review;
 import com.example.BookSelling.repository.BookRepository;
 import com.example.BookSelling.repository.ReviewRepository;
 import com.example.BookSelling.repository.UserRepository;
 import com.example.BookSelling.service.ReviewService;
+import com.example.BookSelling.service.UserService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -29,6 +29,7 @@ public class ReviewServiceImpl implements ReviewService {
     UserRepository userRepository;
     ReviewRepository reviewRepository;
     BookRepository bookRepository;
+    UserService userService;
 
     @Override
     public ReviewResponse createReview(int userId, ReviewRequest request) {
@@ -83,7 +84,14 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
+    @PreAuthorize("hasRole('ADMIN')")
     public void deleteReview(int reviewId) {
+        var review = reviewRepository.findById(reviewId)
+                .orElseThrow(()-> new AppException(ErrorCode.REVIEW_NOT_FOUND));
+        var user = userService.getCurrentUserId();
+        if(!review.getUser().getUserId().equals(user)){
+            throw new AppException(ErrorCode.UNAUTHORIZED);
+        }
         reviewRepository.deleteById(reviewId);
     }
 
@@ -105,6 +113,7 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
+    @PreAuthorize("hasRole('ADMIN')")
     public ReviewResponse getReviewsByUserId(Integer userId) {
         return null;
     }

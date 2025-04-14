@@ -8,6 +8,8 @@ import com.example.BookSelling.dto.response.SearchBookResponse;
 
 import com.example.BookSelling.dto.response.BookResponse;
 
+import com.example.BookSelling.exception.AppException;
+import com.example.BookSelling.exception.ErrorCode;
 import com.example.BookSelling.model.Book;
 import com.example.BookSelling.model.User;
 import com.example.BookSelling.repository.BookRepository;
@@ -17,6 +19,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -33,7 +36,7 @@ public class BookServiceImpl implements BookService {
     BookRepository bookRepository;
     UserRepository userRepository;
 
-
+    @PreAuthorize("hasAnyRole('ADMIN', 'SELLER')")
     @Override
     public BookResponse addNewBook(Integer userId, BookRequest request) {
         User user = userRepository.findById(userId)
@@ -58,6 +61,7 @@ public class BookServiceImpl implements BookService {
         return mapToBookResponse(savedBook);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'SELLER')")
     @Override
     public BookResponse updateBook(Integer bookId, BookRequest request) {
         Book existingBook = bookRepository.findById(bookId)
@@ -76,10 +80,11 @@ public class BookServiceImpl implements BookService {
         return mapToBookResponse(updatedBook);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'SELLER')")
     @Override
     public BookResponse changeBookStatus(Integer bookId, boolean isActive) {
         Book book = bookRepository.findById(bookId)
-                .orElseThrow(() -> new RuntimeException("Book not found"));
+                .orElseThrow(() -> new AppException(ErrorCode.BOOK_NOT_FOUND));
         book.setActive(isActive);
         Book updatedBook = bookRepository.save(book);
         return mapToBookResponse(updatedBook);
@@ -96,11 +101,12 @@ public class BookServiceImpl implements BookService {
     @Override
     public BookResponse getBookById(Integer bookId) {
         Book book = bookRepository.findById(bookId)
-                .orElseThrow(() -> new RuntimeException("Book not found"));
+                .orElseThrow(() -> new AppException(ErrorCode.BOOK_NOT_FOUND));
         return mapToBookResponse(book);
     }
 
     @Override
+    @PreAuthorize("hasAnyRole('ADMIN', 'SELLER')")
     public List<BookResponse> getMyShopBooks(Integer userId) {
         List<Book> books = bookRepository.findByUserUserIdAndIsApprovedTrue(userId);
         return books.stream()
@@ -109,6 +115,7 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
+    @PreAuthorize("hasAnyRole('ADMIN', 'SELLER')")
     public List<BookResponse> getMyRequestBooks(Integer userId) {
         List<Book> books = bookRepository.findByUserUserIdAndIsApprovedFalse(userId);
         return books.stream()
@@ -156,20 +163,20 @@ public class BookServiceImpl implements BookService {
     @Override
     public SearchBookResponse searchBookHandler(String keyword) {
         List<Book> books = bookRepository.searchBookByKeyWord(keyword);
-        SearchBookResponse searchBookResponse = new SearchBookResponse(books,books.size());
-        return searchBookResponse;
-
+        return new SearchBookResponse(books, books.size());
+    }
+    @PreAuthorize("hasRole('ADMIN')")
     @Override
     public BookResponse approveBook(Integer bookId, Integer adminId) {
         User admin = userRepository.findById(adminId)
-                .orElseThrow(() -> new RuntimeException("Admin not found"));
+                .orElseThrow(() -> new AppException(ErrorCode.UNAUTHORIZED));
 
         if (!admin.getUserRole().equals(UserRole.ADMIN)) {
-            throw new RuntimeException("Permission denied: Only admin can approve books.");
+            throw new AppException(ErrorCode.UNAUTHORIZED);
         }
 
         var book = bookRepository.findById(bookId)
-                .orElseThrow(() -> new RuntimeException("Book not found"));
+                .orElseThrow(() -> new AppException(ErrorCode.BOOK_NOT_FOUND));
 
         book.setApproved(true);
         book.setActive(true);

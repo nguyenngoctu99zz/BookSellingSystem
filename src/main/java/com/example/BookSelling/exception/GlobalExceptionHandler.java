@@ -2,6 +2,7 @@ package com.example.BookSelling.exception;
 
 import com.example.BookSelling.dto.response.ResponseData;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -28,6 +29,16 @@ public class GlobalExceptionHandler {
         responseData.setCode(errorCode.getErrorCode());
         responseData.setMessage(errorCode.getErrorMessage());
         return ResponseEntity.status(errorCode.getHttpStatusCode()).body(responseData);
+    }
+    @ExceptionHandler(value = AuthorizationDeniedException.class)
+    ResponseEntity<ResponseData<?>> handleAccessDeniedException() {
+        ErrorCode errorCode = ErrorCode.UNAUTHORIZED;
+        return ResponseEntity.status(errorCode.getHttpStatusCode())
+                .body(
+                        ResponseData.builder()
+                                .code(errorCode.getErrorCode())
+                                .message(errorCode.getErrorMessage())
+                                .build());
     }
 
 }

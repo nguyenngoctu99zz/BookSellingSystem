@@ -4,6 +4,7 @@ import com.example.BookSelling.common.OrderStatus;
 import com.example.BookSelling.dto.request.OrderItemRequest;
 import com.example.BookSelling.dto.response.OrderItemResponse;
 import com.example.BookSelling.exception.AppException;
+import com.example.BookSelling.exception.ErrorCode;
 import com.example.BookSelling.model.Book;
 import com.example.BookSelling.model.OrderItem;
 import com.example.BookSelling.model.User;
@@ -14,6 +15,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -35,7 +37,7 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     public List<OrderItemResponse> getOrdersByUserId(Integer userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new AppException("User not found"));
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
         return orderItemRepository.findByUser(user).stream()
                 .map(this::mapToResponse)
@@ -46,10 +48,10 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     public OrderItemResponse addToOrder(Integer userId, OrderItemRequest request) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new AppException("User not found"));
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
         Book book = bookRepository.findById(request.getBookId())
-                .orElseThrow(() -> new AppException("Book not found"));
+                .orElseThrow(() -> new AppException(ErrorCode.BOOK_NOT_FOUND));
 
         if (book.getQuantity() < request.getQuantity()) {
             throw new AppException("Not enough quantity available");
@@ -78,7 +80,7 @@ public class OrderServiceImpl implements OrderService {
                 .orElseThrow(() -> new AppException("Order item not found"));
 
         if (!orderItem.getUser().getUserId().equals(userId)) {
-            throw new AppException("Unauthorized access");
+            throw new AppException(ErrorCode.UNAUTHORIZED);
         }
 
         if (orderItem.getOrderStatus() != OrderStatus.PENDING) {
@@ -109,7 +111,7 @@ public class OrderServiceImpl implements OrderService {
                 .orElseThrow(() -> new AppException("Order item not found"));
 
         if (!orderItem.getUser().getUserId().equals(userId)) {
-            throw new AppException("Unauthorized access");
+            throw new AppException(ErrorCode.UNAUTHORIZED);
         }
 
         if (orderItem.getOrderStatus() == OrderStatus.PENDING ||
@@ -124,6 +126,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
+    @PreAuthorize("hasRole('SELLER')")
     public OrderItemResponse approveOrderItem(Integer sellerId, Integer orderItemId) {
         User seller = userRepository.findById(sellerId)
                 .orElseThrow(() -> new AppException("Seller not found"));
@@ -132,7 +135,7 @@ public class OrderServiceImpl implements OrderService {
                 .orElseThrow(() -> new AppException("Order not found"));
 
         if (!orderItem.getBook().getUser().getUserId().equals(sellerId)) {
-            throw new AppException("Unauthorized access");
+            throw new AppException(ErrorCode.UNAUTHORIZED);
         }
 
         if (orderItem.getOrderStatus() != OrderStatus.PENDING) {
@@ -150,6 +153,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
+    @PreAuthorize("hasRole('SELLER')")
     public List<OrderItemResponse> getPendingOrdersForSeller(Integer sellerId) {
         User seller = userRepository.findById(sellerId)
                 .orElseThrow(() -> new AppException("Seller not found"));
@@ -162,6 +166,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
+    @PreAuthorize("hasRole('SELLER')")
     public OrderItemResponse rejectOrderItem(Integer sellerId, Integer orderItemId) {
         User seller = userRepository.findById(sellerId)
                 .orElseThrow(() -> new AppException("Seller not found"));
