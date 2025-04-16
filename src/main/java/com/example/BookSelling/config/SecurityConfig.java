@@ -35,7 +35,8 @@ public class SecurityConfig {
     private static final String[] White_List = {
             "/auth/**",
             "/users",
-            "/reviews/**"
+            "/reviews/**",
+            "/image/**"
     };
 
     @Value("${jwt.signer-key}")
@@ -46,6 +47,7 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(request -> request
                         .requestMatchers(HttpMethod.POST, White_List).permitAll()
+                        .requestMatchers(HttpMethod.GET,"/image/**").permitAll()
                         .anyRequest().authenticated())
                 .oauth2ResourceServer(oauth2 ->
                         oauth2.jwt(jwtConfigurer -> jwtConfigurer.decoder(jwtDecoder())))
