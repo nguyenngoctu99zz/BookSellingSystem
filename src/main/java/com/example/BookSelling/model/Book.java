@@ -42,5 +42,7 @@ public class Book {
     @ManyToOne
     @JoinColumn(name = "storeId")
     Store store;
+    @OneToMany(mappedBy = "book")
+    List<BookImage> bookImages;
 
 }
