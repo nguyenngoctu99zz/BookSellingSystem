@@ -34,7 +34,7 @@ public class SecurityConfig {
     private final InvalidatedTokenRepository invalidatedTokenRepository;
     private static final String[] White_List = {
             "/auth/**",
-            "/users",
+            "/book/**",
             "/reviews/**",
             "/image/**"
     };
@@ -46,8 +46,8 @@ public class SecurityConfig {
         httpSecurity
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(request -> request
-                        .requestMatchers(HttpMethod.POST, White_List).permitAll()
-                        .requestMatchers(HttpMethod.GET,"/image/**").permitAll()
+                        .requestMatchers(White_List).permitAll()
+                        .requestMatchers(HttpMethod.POST,"/users").permitAll()
                         .anyRequest().authenticated())
                 .oauth2ResourceServer(oauth2 ->
                         oauth2.jwt(jwtConfigurer -> jwtConfigurer.decoder(jwtDecoder())))
