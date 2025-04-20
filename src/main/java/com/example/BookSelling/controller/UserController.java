@@ -1,6 +1,7 @@
 package com.example.BookSelling.controller;
 
 import com.example.BookSelling.dto.request.UserCreationRequest;
+import com.example.BookSelling.dto.request.UserUpdateRequest;
 import com.example.BookSelling.dto.response.ResponseData;
 import com.example.BookSelling.dto.response.UserResponse;
 import com.example.BookSelling.service.UserService;
@@ -22,6 +23,14 @@ public class UserController {
         return userService.createUser(request);
     }
 
+    @PutMapping("{userId}")
+    public ResponseData<UserResponse> updateUser(@PathVariable("userId") int userId, @RequestBody UserUpdateRequest request){
+        return ResponseData.<UserResponse>builder()
+                .code(200)
+                .message("User updated")
+                .data(userService.updateUser(userId, request))
+                .build();
+    }
     @GetMapping("")
     public ResponseData<List<UserResponse>> getAllUsers(){
         return ResponseData.<List<UserResponse>>builder()
