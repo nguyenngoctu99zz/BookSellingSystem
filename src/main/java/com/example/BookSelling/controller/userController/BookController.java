@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/book")
 @RequiredArgsConstructor
@@ -21,6 +23,15 @@ public class BookController {
 
     BookService bookService;
 
+    @GetMapping("")
+    public ResponseData<List<BookResponse>> getAllBooks() {
+        List<BookResponse> books = bookService.getAllBooks();
+        return ResponseData.<List<BookResponse>>builder()
+                .code(200)
+                .message("Success")
+                .data(books)
+                .build();
+    }
     @GetMapping("/new-book")
     public ResponseEntity<NewBookByPageResponse> showNewBooks(@RequestParam(name = "pageNumber") int pageNumber, @RequestParam(name = "numberOfBookEachPage") int numberOfBookEachPage){
        return ResponseEntity.ok().header("Content-Type","application/json").body(bookService.newBookPageHandler(pageNumber,numberOfBookEachPage));

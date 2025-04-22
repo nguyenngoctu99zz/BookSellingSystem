@@ -18,7 +18,6 @@ public class UserUpdateRequest {
     String phoneNumber;
     String email;
     String userImage;
-    LocalDateTime createdAt;
     boolean isActive;
     UserRole userRole;
 }

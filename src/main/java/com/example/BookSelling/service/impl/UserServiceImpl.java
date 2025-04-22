@@ -90,6 +90,9 @@ public class UserServiceImpl implements UserService {
                 .email(user.getEmail())
                 .phoneNumber(user.getPhoneNumber())
                 .userImage(user.getUserImage())
+                .createdAt(user.getCreatedAt())
+                .userRole(user.getUserRole())
+                .isActive(user.isActive())
                 .build();
     }
 
