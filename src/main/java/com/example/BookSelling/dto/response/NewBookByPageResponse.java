@@ -13,6 +13,6 @@ import java.util.List;
 @Getter
 @Setter
 public class NewBookByPageResponse {
-    private List<Book> bookList;
+    private List<BookResponse> bookList;
     private int numberOfPage;
 }

@@ -56,23 +56,23 @@ public class ManageBookController {
                 .build();
     }
 
-    @GetMapping
-    public ResponseData<List<BookResponse>> getAllBooks() {
-        List<BookResponse> books = bookService.getAllBooks();
-        return ResponseData.<List<BookResponse>>builder()
-                .code(200)
-                .message("Success")
-                .data(books)
-                .build();
-    }
-
-    @GetMapping("/{bookId}")
-    public ResponseData<BookResponse> getBookById(@PathVariable Integer bookId) {
-        BookResponse book = bookService.getBookById(bookId);
-        return ResponseData.<BookResponse>builder()
-                .code(200)
-                .message("Success")
-                .data(book)
-                .build();
-    }
+//    @GetMapping
+//    public ResponseData<List<BookResponse>> getAllBooks() {
+//        List<BookResponse> books = bookService.getAllBooks();
+//        return ResponseData.<List<BookResponse>>builder()
+//                .code(200)
+//                .message("Success")
+//                .data(books)
+//                .build();
+//    }
+//
+//    @GetMapping("/{bookId}")
+//    public ResponseData<BookResponse> getBookById(@PathVariable Integer bookId) {
+//        BookResponse book = bookService.getBookById(bookId);
+//        return ResponseData.<BookResponse>builder()
+//                .code(200)
+//                .message("Success")
+//                .data(book)
+//                .build();
+//    }
 }

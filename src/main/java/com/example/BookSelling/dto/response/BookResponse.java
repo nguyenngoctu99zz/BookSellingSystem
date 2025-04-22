@@ -18,13 +18,14 @@ public class BookResponse {
     String author;
     Integer quantity;
     Double price;
-    List<String> bookImage;
+    String bookImage;
     String description;
     String publishDate;
     LocalDateTime createdAt;
     boolean isActive;
     boolean isApproved;
     Integer sellerId;
+    double discountPercentage;
 //    Integer storeId;
 //    Integer wishListId;
 }

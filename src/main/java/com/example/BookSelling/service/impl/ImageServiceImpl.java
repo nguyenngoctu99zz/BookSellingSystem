@@ -1,8 +1,5 @@
 package com.example.BookSelling.service.impl;
 
-import com.example.BookSelling.model.BookImage;
-import com.example.BookSelling.model.User;
-import com.example.BookSelling.repository.BookImageRepository;
 import com.example.BookSelling.service.ImageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -20,8 +17,7 @@ import java.nio.file.StandardCopyOption;
 
 @Service
 public class ImageServiceImpl implements ImageService {
-    @Autowired
-    BookImageRepository imageRepository;
+
     @Override
     public ResponseEntity<byte[]> showImageAsByte(String imageName) throws IOException {
         Path imagePath = Paths.get("uploads", imageName);

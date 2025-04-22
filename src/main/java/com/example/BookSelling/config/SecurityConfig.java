@@ -36,7 +36,9 @@ public class SecurityConfig {
             "/auth/**",
             "/users",
             "/reviews/**",
-            "/image/**"
+            "/image/**",
+            "/book/**",
+            "/search/**"
     };
 
     @Value("${jwt.signer-key}")
@@ -48,6 +50,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests(request -> request
                         .requestMatchers(HttpMethod.POST, White_List).permitAll()
                         .requestMatchers(HttpMethod.GET,"/image/**").permitAll()
+                        .requestMatchers(HttpMethod.GET,"/payment/**").permitAll()
+                        .requestMatchers(HttpMethod.GET,"/book/**").permitAll()
+                        .requestMatchers(HttpMethod.GET,"/search/**").permitAll()
                         .anyRequest().authenticated())
                 .oauth2ResourceServer(oauth2 ->
                         oauth2.jwt(jwtConfigurer -> jwtConfigurer.decoder(jwtDecoder())))
