@@ -35,8 +35,8 @@ public class PaymentServiceImpl implements PaymentService {
             return ResponseEntity.ok().body(new PaymentResponse("success"));
     }
 
-        String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + "/api/v1/api/payment";
+        String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + "/api/v1/payment";
         String vnpayUrl = vnPayService.createOrder(request, (int) paymentSubmitRequest.getAmount(), paymentSubmitRequest.getOrderInfo(), baseUrl);
-        return ResponseEntity.ok().body(new PaymentResponse("redirect:" + vnpayUrl));
+        return ResponseEntity.ok().body(new PaymentResponse(vnpayUrl));
     }
 }

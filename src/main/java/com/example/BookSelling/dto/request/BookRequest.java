@@ -17,7 +17,7 @@ public class BookRequest {
     String author;
     Integer quantity;
     Double price;
-    List<String> bookImage;
+    String bookImage;
     String description;
     String publishDate;
 }

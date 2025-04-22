@@ -133,7 +133,10 @@ public class BookServiceImpl implements BookService {
     public NewBookByPageResponse newBookPageHandler(int pageNumber, int numberOfBookEachPage){
         int totalNumberOfPage =Math.ceilDiv(getAllBooks().size(),numberOfBookEachPage);
         List<Book> books = getNewestBookInPage(pageNumber,numberOfBookEachPage);
-        return new NewBookByPageResponse(books,totalNumberOfPage);
+        List bookResponse = books.stream()
+                .map(this::mapToBookResponse)
+                .collect(Collectors.toList());
+        return new NewBookByPageResponse(bookResponse,totalNumberOfPage);
     }
 
     @Override
@@ -145,7 +148,10 @@ public class BookServiceImpl implements BookService {
     public NewBookByPageResponse bestReviewBookHandler(int pageNumber, int numberOfBookEachPage) {
         int totalNumberOfPage =Math.ceilDiv(getAllBooks().size(),numberOfBookEachPage);
         List<Book> books = getBestReviewBook(pageNumber,numberOfBookEachPage);
-        return new NewBookByPageResponse(books,totalNumberOfPage);
+        List bookResponse = books.stream()
+                .map(this::mapToBookResponse)
+                .collect(Collectors.toList());
+        return new NewBookByPageResponse(bookResponse,totalNumberOfPage);
     }
 
     @Override
@@ -157,7 +163,10 @@ public class BookServiceImpl implements BookService {
     public NewBookByPageResponse bestDiscountBookHandler(int pageNumber, int numberOfBookEachPage) {
         int totalNumberOfPage =Math.ceilDiv(getAllBooks().size(),numberOfBookEachPage);
         List<Book> books = getBestDiscountBook(pageNumber,numberOfBookEachPage);
-        return new NewBookByPageResponse(books,totalNumberOfPage);
+        List bookResponse = books.stream()
+                .map(this::mapToBookResponse)
+                .collect(Collectors.toList());
+        return new NewBookByPageResponse(bookResponse,totalNumberOfPage);
     }
 
     @Override

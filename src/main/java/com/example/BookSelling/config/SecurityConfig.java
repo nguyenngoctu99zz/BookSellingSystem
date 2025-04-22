@@ -36,7 +36,9 @@ public class SecurityConfig {
             "/auth/**",
             "/book/**",
             "/reviews/**",
-            "/image/**"
+            "/image/**",
+            "/book/**",
+            "/search/**"
     };
 
     @Value("${jwt.signer-key}")
@@ -46,9 +48,17 @@ public class SecurityConfig {
         httpSecurity
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(request -> request
+
+                        .requestMatchers(HttpMethod.POST, White_List).permitAll()
+                        .requestMatchers(HttpMethod.GET,"/image/**").permitAll()
+                        .requestMatchers(HttpMethod.GET,"/payment/**").permitAll()
+                        .requestMatchers(HttpMethod.GET,"/book/**").permitAll()
+                        .requestMatchers(HttpMethod.GET,"/search/**").permitAll()
+
                         .requestMatchers(White_List).permitAll()
                         .requestMatchers(HttpMethod.POST,"/users").permitAll()
                         .requestMatchers(HttpMethod.PUT,"/users/{userId}").permitAll()
+
                         .anyRequest().authenticated())
                 .oauth2ResourceServer(oauth2 ->
                         oauth2.jwt(jwtConfigurer -> jwtConfigurer.decoder(jwtDecoder())))

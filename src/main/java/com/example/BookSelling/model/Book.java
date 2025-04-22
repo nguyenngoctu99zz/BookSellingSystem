@@ -25,7 +25,7 @@ public class Book {
     String author;
     Integer quantity;
     Double price;
-    List<String> bookImage;
+    String bookImage;
     String description;
     String publishDate;
     LocalDateTime createdAt;
@@ -39,10 +39,6 @@ public class Book {
     @JoinColumn(name = "sellerId")
     User user;
 
-    @ManyToOne
-    @JoinColumn(name = "storeId")
-    Store store;
-    @OneToMany(mappedBy = "book")
-    List<BookImage> bookImages;
+
 
 }

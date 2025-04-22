@@ -66,13 +66,15 @@ public class ManageBookController {
 //                .build();
 //    }
 
-    @GetMapping("/{bookId}")
-    public ResponseData<BookResponse> getBookById(@PathVariable Integer bookId) {
-        BookResponse book = bookService.getBookById(bookId);
-        return ResponseData.<BookResponse>builder()
-                .code(200)
-                .message("Success")
-                .data(book)
-                .build();
-    }
+//
+//    @GetMapping("/{bookId}")
+//    public ResponseData<BookResponse> getBookById(@PathVariable Integer bookId) {
+//        BookResponse book = bookService.getBookById(bookId);
+//        return ResponseData.<BookResponse>builder()
+//                .code(200)
+//                .message("Success")
+//                .data(book)
+//                .build();
+//    }
+
 }
