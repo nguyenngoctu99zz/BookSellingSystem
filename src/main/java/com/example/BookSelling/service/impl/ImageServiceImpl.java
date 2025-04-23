@@ -1,7 +1,6 @@
 package com.example.BookSelling.service.impl;
 
 import com.example.BookSelling.service.ImageService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -28,7 +27,6 @@ public class ImageServiceImpl implements ImageService {
 
         return new ResponseEntity<>(imageBytes, headers, HttpStatus.OK);
     }
-//anh em có trường hợp khác thì tạo function uploadImage vs param mới rồi đổi cái set model nhé
     @Override
     public String uploadImage(MultipartFile file,String filename) {
         try {
@@ -40,7 +38,7 @@ public class ImageServiceImpl implements ImageService {
             }
 
             Files.copy(file.getInputStream(), uploadPath.resolve(fileName), StandardCopyOption.REPLACE_EXISTING);
-            return "success";
+            return fileName;
         } catch (IOException e) {
             return "Failed to upload image";
         }

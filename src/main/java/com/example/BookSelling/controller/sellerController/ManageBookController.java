@@ -8,6 +8,7 @@ import com.example.BookSelling.service.UserService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -32,10 +33,10 @@ public class ManageBookController {
                 .build();
     }
 
-    @PutMapping("/{bookId}")
+    @PutMapping(value = "/{bookId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseData<BookResponse> updateBook(
             @PathVariable Integer bookId,
-            @RequestBody BookRequest request) {
+            @ModelAttribute BookRequest request) {
         BookResponse updatedBook = bookService.updateBook(bookId, request);
         return ResponseData.<BookResponse>builder()
                 .code(200)

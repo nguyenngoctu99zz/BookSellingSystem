@@ -15,6 +15,7 @@ import com.example.BookSelling.model.User;
 import com.example.BookSelling.repository.BookRepository;
 import com.example.BookSelling.repository.UserRepository;
 import com.example.BookSelling.service.BookService;
+import com.example.BookSelling.service.ImageService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -22,6 +23,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -35,12 +40,17 @@ public class BookServiceImpl implements BookService {
 
     BookRepository bookRepository;
     UserRepository userRepository;
+    ImageService imageService;
 
     @PreAuthorize("hasAnyRole('ADMIN', 'SELLER')")
     @Override
     public BookResponse addNewBook(Integer userId, BookRequest request) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
+        String imageName = null;
+        if (request.getBookImage() != null && !request.getBookImage().isEmpty()) {
+            imageName = imageService.uploadImage(request.getBookImage(), null);
+        }
 
         Book book = Book.builder()
                 .bookTitle(request.getBookTitle())
@@ -48,7 +58,7 @@ public class BookServiceImpl implements BookService {
                 .author(request.getAuthor())
                 .quantity(request.getQuantity())
                 .price(request.getPrice())
-                .bookImage(request.getBookImage())
+                .bookImage(imageName)
                 .description(request.getDescription())
                 .publishDate(request.getPublishDate())
                 .createdAt(LocalDateTime.now())
@@ -67,12 +77,25 @@ public class BookServiceImpl implements BookService {
         Book existingBook = bookRepository.findById(bookId)
                 .orElseThrow(() -> new RuntimeException("Book not found"));
 
+        String imageName = existingBook.getBookImage();
+        if (request.getBookImage() != null && !request.getBookImage().isEmpty()) {
+            try {
+                if (imageName != null) {
+                    Path oldImagePath = Paths.get("uploads", imageName);
+                    Files.deleteIfExists(oldImagePath);
+                }
+
+                imageName = imageService.uploadImage(request.getBookImage(), null);
+            } catch (IOException e) {
+                throw new RuntimeException("Failed to update image: " + e.getMessage());
+            }
+        }
         existingBook.setBookTitle(request.getBookTitle());
         existingBook.setPublisher(request.getPublisher());
         existingBook.setAuthor(request.getAuthor());
         existingBook.setQuantity(request.getQuantity());
         existingBook.setPrice(request.getPrice());
-        existingBook.setBookImage(request.getBookImage());
+        existingBook.setBookImage(imageName);
         existingBook.setDescription(request.getDescription());
         existingBook.setPublishDate(request.getPublishDate());
 

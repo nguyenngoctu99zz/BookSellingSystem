@@ -9,6 +9,7 @@ import com.example.BookSelling.exception.ErrorCode;
 import com.example.BookSelling.model.User;
 import com.example.BookSelling.repository.InvalidatedTokenRepository;
 import com.example.BookSelling.repository.UserRepository;
+import com.example.BookSelling.service.ImageService;
 import com.example.BookSelling.service.UserService;
 import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
@@ -21,6 +22,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -32,10 +37,15 @@ public class UserServiceImpl implements UserService {
     UserRepository userRepository;
     PasswordEncoder passwordEncoder;
     InvalidatedTokenRepository invalidatedTokenRepository;
+    ImageService imageService;
     @Override
     public UserResponse createUser(UserCreationRequest request) {
         var role = (request.getUserRole() != null) ?
                 request.getUserRole() : UserRole.USER;
+        String imageName = null;
+        if (request.getUserImage() != null && !request.getUserImage().isEmpty()) {
+            imageName = imageService.uploadImage(request.getUserImage(), null);
+        }
         User user = User.builder()
                 .username(request.getUsername())
                 .password(passwordEncoder.encode(request.getPassword()))
@@ -43,7 +53,7 @@ public class UserServiceImpl implements UserService {
                 .email(request.getEmail())
                 .phoneNumber(request.getPhoneNumber())
                 .createdAt(LocalDateTime.now())
-//                .userImage(request.getUserImage())
+                .userImage(imageName)
                 .userRole(role)
                 .isActive(true)
                 .build();
@@ -74,12 +84,24 @@ public class UserServiceImpl implements UserService {
     public UserResponse updateUser(int userId, UserUpdateRequest request) {
         var user = userRepository.findById(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        String imageName = user.getUserImage();
+        if (request.getUserImage() != null && !request.getUserImage().isEmpty()) {
+            try {
+                if (imageName != null) {
+                    Path oldImagePath = Paths.get("uploads", imageName);
+                    Files.deleteIfExists(oldImagePath);
+                }
 
+                imageName = imageService.uploadImage(request.getUserImage(), null);
+            } catch (IOException e) {
+                throw new RuntimeException("Failed to update image: " + e.getMessage());
+            }
+        }
         user.setUsername(request.getUsername());
         user.setFullName(request.getFullName());
         user.setEmail(request.getEmail());
         user.setPhoneNumber(request.getPhoneNumber());
-        user.setUserImage(request.getUserImage());
+        user.setUserImage(imageName);
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         userRepository.save(user);
 

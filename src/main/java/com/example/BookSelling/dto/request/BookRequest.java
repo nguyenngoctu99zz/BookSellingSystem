@@ -3,6 +3,7 @@ package com.example.BookSelling.dto.request;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -17,7 +18,7 @@ public class BookRequest {
     String author;
     Integer quantity;
     Double price;
-    String bookImage;
     String description;
     String publishDate;
+    MultipartFile bookImage;
 }

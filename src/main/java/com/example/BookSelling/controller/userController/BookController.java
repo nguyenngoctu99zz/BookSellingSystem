@@ -7,11 +7,8 @@ import com.example.BookSelling.service.BookService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 import java.util.List;
 
@@ -45,16 +42,6 @@ public class BookController {
     @GetMapping("/best-discount")
     public ResponseEntity<NewBookByPageResponse> showBestDiscountBook(@RequestParam(name ="pageNumber") int pageNumber,@RequestParam(name = "numberOfBookEachPage") int numberOfBookEachPage){
         return ResponseEntity.ok().header("Content-Type", "application/json").body(bookService.bestDiscountBookHandler(pageNumber,numberOfBookEachPage));
-    }
-
-    @GetMapping
-    public ResponseData<List<BookResponse>> getAllBooks() {
-        List<BookResponse> books = bookService.getAllBooks();
-        return ResponseData.<List<BookResponse>>builder()
-                .code(200)
-                .message("Success")
-                .data(books)
-                .build();
     }
 
     @GetMapping("/{bookId}")

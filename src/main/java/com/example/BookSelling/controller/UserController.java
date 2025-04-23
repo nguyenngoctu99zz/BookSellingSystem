@@ -8,6 +8,7 @@ import com.example.BookSelling.service.UserService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,13 +19,13 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class UserController {
     UserService userService;
-    @PostMapping("")
-    public UserResponse createUser(@RequestBody UserCreationRequest request){
+    @PostMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public UserResponse createUser(@ModelAttribute UserCreationRequest request){
         return userService.createUser(request);
     }
 
-    @PutMapping("{userId}")
-    public ResponseData<UserResponse> updateUser(@PathVariable("userId") int userId, @RequestBody UserUpdateRequest request){
+    @PutMapping(value = "/{userId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseData<UserResponse> updateUser(@PathVariable("userId") int userId, @ModelAttribute UserUpdateRequest request){
         return ResponseData.<UserResponse>builder()
                 .code(200)
                 .message("User updated")
@@ -52,5 +53,9 @@ public class UserController {
     @DeleteMapping("/{userId}")
     public void deleteUser(@PathVariable int userId){
         userService.deleteUser(userId);
+    }
+    @DeleteMapping("disable/{userId}")
+    public void softDeleteUser(@PathVariable int userId){
+        userService.softDeleteUser(userId);
     }
 }

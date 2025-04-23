@@ -10,6 +10,7 @@ import com.example.BookSelling.service.UserService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,8 +25,8 @@ public class RequestBookController {
     UserService userService;
     BookService bookService;
 
-    @PostMapping
-    public ResponseData<BookResponse> addNewBook(@RequestBody BookRequest request) {
+    @PostMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseData<BookResponse> addNewBook(@ModelAttribute BookRequest request) {
         Integer currentUserId = userService.getCurrentUserId();
         BookResponse newBook = bookService.addNewBook(currentUserId, request);
         return ResponseData.<BookResponse>builder()

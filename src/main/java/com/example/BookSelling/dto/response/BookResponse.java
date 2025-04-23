@@ -26,6 +26,4 @@ public class BookResponse {
     boolean isApproved;
     Integer sellerId;
     double discountPercentage;
-//    Integer storeId;
-//    Integer wishListId;
 }
