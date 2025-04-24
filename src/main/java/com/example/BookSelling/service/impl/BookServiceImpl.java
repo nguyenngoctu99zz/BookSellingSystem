@@ -251,6 +251,7 @@ public class BookServiceImpl implements BookService {
                 .isActive(book.isActive())
                 .isApproved(book.isApproved())
                 .sellerId(book.getUser() != null ? book.getUser().getUserId() : null)
+                .discountPercentage(book.getDiscountPercentage())
 //                .storeId(book.getStore() != null ? book.getStore().getStoreId() : null)
 //                .wishListId(book.getWishList() != null ? book.getWishList().getWishListId() : null)
                 .build();
