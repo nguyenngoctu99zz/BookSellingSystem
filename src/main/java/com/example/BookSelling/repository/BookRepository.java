@@ -33,10 +33,12 @@ public interface BookRepository extends JpaRepository<Book, Integer> {
             "CASE WHEN b.description LIKE CONCAT('%', ?1, '%') THEN 0.5 ELSE 0 END) AS relevance_score " +
             "FROM books b " +
             "WHERE " +
-            "    MATCH(b.book_title, b.author, b.description) AGAINST(?1 IN BOOLEAN MODE) " +
+            "   (MATCH(b.book_title, b.author, b.description) AGAINST(?1 IN BOOLEAN MODE) " +
             "    OR b.book_title LIKE CONCAT('%', ?1, '%') " +
             "    OR b.author LIKE CONCAT('%', ?1, '%') " +
-            "    OR b.description LIKE CONCAT('%', ?1, '%') " +
+            "    OR b.description LIKE CONCAT('%', ?1, '%')) " +
+            "   AND b.is_active = true " +
+            "   AND b.is_approved = true " +
             "ORDER BY relevance_score DESC", nativeQuery = true)
  public List<Book> searchBookByKeyWord(String keyword);
     //run in sql before test search:

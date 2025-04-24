@@ -4,6 +4,7 @@ import com.example.BookSelling.common.PaymentMethod;
 import com.example.BookSelling.common.PaymentStatus;
 import com.example.BookSelling.dto.request.PaymentSubmitRequest;
 import com.example.BookSelling.dto.response.PaymentResponse;
+import com.example.BookSelling.model.Book;
 import com.example.BookSelling.model.OrderItem;
 import com.example.BookSelling.model.Payment;
 import com.example.BookSelling.repository.BookRepository;
@@ -22,6 +23,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @RestController
@@ -45,7 +47,7 @@ public class PaymentController {
 
     @PostMapping("/submitOrder")
     public ResponseEntity<PaymentResponse> submitOrder(@RequestBody PaymentSubmitRequest paymentSubmitRequest, HttpServletRequest request){
-             return paymentService.paymentHandler(paymentSubmitRequest,request);
+        return paymentService.paymentHandler(paymentSubmitRequest,request);
     }
 
     @GetMapping("/vnpay-payment-return")
@@ -56,7 +58,8 @@ public class PaymentController {
         String transactionId = request.getParameter("vnp_TransactionNo");
         String totalPrice = request.getParameter("vnp_Amount");
         if(paymentStatus==1) {
-            Payment payment = Payment.builder().paymentAmount(Double.parseDouble(totalPrice))
+            Book book = bookRepository.findById(Integer.parseInt(orderInfo.split(",")[1].split(":")[1])).get();
+            Payment payment = Payment.builder().paymentAmount(Double.parseDouble(totalPrice)/100)
                     .paymentMethod(PaymentMethod.VNPAY)
                     .paymentStatus(paymentStatus == 1 ? PaymentStatus.SUCCEED : PaymentStatus.FAILED)
                     .orderInfo(orderInfo)
@@ -64,16 +67,21 @@ public class PaymentController {
             paymentRepository.saveAndFlush(payment);
             System.out.println(Integer.parseInt(orderInfo.split(",")[0].split(":")[1]));
             OrderItem orderItem = OrderItem.builder().orderStatus(OrderStatus.PENDING)
-                    .book(bookRepository.findById(Integer.parseInt(orderInfo.split(",")[1].split(":")[1])).get())
+                    .book(book)
                     .user(userRepository.findById(Integer.parseInt(orderInfo.split(",")[0].split(":")[1])).get())
                     .payment(payment)
                     .quantity(Integer.parseInt(orderInfo.split(",")[2].split(":")[1]))
+                    .orderDate(LocalDateTime.now())
                     .totalPrice(Double.parseDouble(totalPrice)/100).build();
             orderItemRepository.save(orderItem);
+
+            book.setQuantity(book.getQuantity()-Integer.parseInt(orderInfo.split(",")[2].split(":")[1]));
+            bookRepository.save(book);
             URI redirectUri = URI.create("http://localhost:5173/book-detail/success");
             return ResponseEntity.status(HttpStatus.FOUND) // 302 redirect
                     .location(redirectUri)
                     .build();
+
         }
         URI redirectUri = URI.create("http://localhost:5173/book-detail/fail");
         return ResponseEntity.status(HttpStatus.FOUND) // 302 redirect
