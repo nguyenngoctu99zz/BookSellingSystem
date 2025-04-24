@@ -59,6 +59,9 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST,"/users").permitAll()
                         .requestMatchers(HttpMethod.PUT,"/users/{userId}").permitAll()
 
+                        .requestMatchers( "/manage-book/**").hasRole("SELLER")
+                        .requestMatchers( "/manage-order/**").hasRole("SELLER")
+
                         .anyRequest().authenticated())
                 .oauth2ResourceServer(oauth2 ->
                         oauth2.jwt(jwtConfigurer -> jwtConfigurer.decoder(jwtDecoder())))

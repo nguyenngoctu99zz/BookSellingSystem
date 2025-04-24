@@ -20,6 +20,7 @@ public interface BookService {
     BookResponse getBookById(Integer bookId);
     List<BookResponse> getMyShopBooks(Integer userId);
     List<BookResponse> getMyRequestBooks(Integer userId);
+    void deleteRequestBook(Integer userId, Integer bookId);
     BookResponse approveBook(Integer bookId, Integer userId);
 
 

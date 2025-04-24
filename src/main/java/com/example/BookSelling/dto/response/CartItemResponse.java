@@ -18,4 +18,5 @@ public class CartItemResponse {
     BigDecimal bookPrice;
     Integer quantity;
     BigDecimal totalPrice;
+    String bookImage;
 }

@@ -164,6 +164,7 @@ public class CartServiceImpl implements CartService {
                 .bookPrice(BigDecimal.valueOf(cartItem.getBook().getPrice()))
                 .quantity(cartItem.getQuantity())
                 .totalPrice(BigDecimal.valueOf(cartItem.getTotalPrice()))
+                .bookImage(cartItem.getBook().getBookImage())
                 .build();
     }
 

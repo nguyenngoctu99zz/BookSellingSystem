@@ -217,6 +217,24 @@ public class BookServiceImpl implements BookService {
         return mapToBookResponse(approvedBook);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'SELLER')")
+    @Override
+    public void deleteRequestBook(Integer userId, Integer bookId) {
+        Book book = bookRepository.findById(bookId)
+                .orElseThrow(() -> new AppException(ErrorCode.BOOK_NOT_FOUND));
+
+        if (!book.getUser().getUserId().equals(userId)) {
+            throw new AppException(ErrorCode.UNAUTHORIZED);
+        }
+
+        // not allow approved booked getting deleted
+        if (book.isApproved()) {
+            throw new AppException("BOOK_ALREADY_APPROVED");
+        }
+
+        bookRepository.delete(book);
+    }
+
 
     private BookResponse mapToBookResponse(Book book) {
         return BookResponse.builder()

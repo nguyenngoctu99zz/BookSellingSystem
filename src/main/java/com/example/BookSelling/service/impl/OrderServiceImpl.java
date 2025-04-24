@@ -201,6 +201,7 @@ public class OrderServiceImpl implements OrderService {
                 .orderDate(orderItem.getOrderDate())
                 .orderStatus(orderItem.getOrderStatus())
                 .totalPrice(BigDecimal.valueOf(orderItem.getTotalPrice()))
+                .bookImage(orderItem.getBook().getBookImage())
                 .build();
     }
 

@@ -21,4 +21,5 @@ public class OrderItemResponse {
     LocalDateTime orderDate;
     OrderStatus orderStatus;
     BigDecimal totalPrice;
+    String bookImage;
 }

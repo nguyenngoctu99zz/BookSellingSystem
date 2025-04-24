@@ -14,7 +14,7 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class ImageController {
 
-    ImageService imageService;
+    private final ImageService imageService;
 
     @GetMapping("/show")
     public ResponseEntity<byte[]> getBookImage(@RequestParam String imageName) throws IOException {

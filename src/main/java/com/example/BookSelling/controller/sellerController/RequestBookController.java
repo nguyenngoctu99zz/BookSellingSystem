@@ -47,4 +47,16 @@ public class RequestBookController {
                 .build();
     }
 
+
+    @DeleteMapping("/{bookId}")
+    public ResponseEntity<?> deleteRequestBook(@PathVariable Integer bookId) {
+        Integer currentUserId = userService.getCurrentUserId();
+        bookService.deleteRequestBook(currentUserId, bookId);
+        return ResponseEntity.ok()
+                .body(ResponseData.builder()
+                        .code(200)
+                        .message("Book request deleted successfully")
+                        .build());
+    }
+
 }
