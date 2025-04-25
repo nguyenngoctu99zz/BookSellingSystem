@@ -16,6 +16,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -84,6 +85,8 @@ public class UserServiceImpl implements UserService {
     public UserResponse updateUser(int userId, UserUpdateRequest request) {
         var user = userRepository.findById(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+
+        // Xử lý ảnh đại diện nếu có upload mới
         String imageName = user.getUserImage();
         if (request.getUserImage() != null && !request.getUserImage().isEmpty()) {
             try {
@@ -91,20 +94,35 @@ public class UserServiceImpl implements UserService {
                     Path oldImagePath = Paths.get("uploads", imageName);
                     Files.deleteIfExists(oldImagePath);
                 }
-
                 imageName = imageService.uploadImage(request.getUserImage(), null);
             } catch (IOException e) {
                 throw new RuntimeException("Failed to update image: " + e.getMessage());
             }
+            user.setUserImage(imageName);
         }
-        user.setUsername(request.getUsername());
-        user.setFullName(request.getFullName());
-        user.setEmail(request.getEmail());
-        user.setPhoneNumber(request.getPhoneNumber());
-        user.setUserImage(imageName);
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
-        user.setUserRole(request.getUserRole());
+
+        // Cập nhật các trường nếu có dữ liệu mới từ request
+        if (request.getUsername() != null && !request.getUsername().isBlank()) {
+            user.setUsername(request.getUsername());
+        }
+        if (request.getFullName() != null && !request.getFullName().isBlank()) {
+            user.setFullName(request.getFullName());
+        }
+        if (request.getEmail() != null && !request.getEmail().isBlank()) {
+            user.setEmail(request.getEmail());
+        }
+        if (request.getPhoneNumber() != null && !request.getPhoneNumber().isBlank()) {
+            user.setPhoneNumber(request.getPhoneNumber());
+        }
+        if (request.getPassword() != null && !request.getPassword().isBlank()) {
+            user.setPassword(passwordEncoder.encode(request.getPassword()));
+        }
+        if (request.getUserRole() != null) {
+            user.setUserRole(request.getUserRole());
+        }
+
         user.setActive(request.isActive());
+
         userRepository.save(user);
 
         return UserResponse.builder()
@@ -119,6 +137,7 @@ public class UserServiceImpl implements UserService {
                 .isActive(user.isActive())
                 .build();
     }
+
 
     @Override
     @PreAuthorize("hasRole('ADMIN')")
@@ -140,7 +159,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @PreAuthorize("hasRole('ADMIN')")
+    @PostAuthorize("returnObject.username == authentication.name")
     public UserResponse getUserById(int userId) {
         var user = userRepository.findById(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
