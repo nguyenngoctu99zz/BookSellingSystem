@@ -9,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RestController
@@ -27,6 +29,29 @@ public class AdminBookController {
                 .message("Book approved successfully")
                 .data(approvedBook)
                 .build();
+    }
+    @DeleteMapping("/{bookId}/reject")
+    public ResponseData<BookResponse> rejectBook(@PathVariable int bookId) {
+        int adminId = userService.getCurrentUserId();
+        BookResponse rejectedBook = bookService.rejectBook(bookId, adminId);
+        return ResponseData.<BookResponse>builder()
+                .code(200)
+                .message("Book rejected successfully")
+                .data(rejectedBook)
+                .build();
+    }
+    @GetMapping("/pending")
+    public ResponseData<List<BookResponse>> getAllPendingBooks() {
+        List<BookResponse> pendingBooks = bookService.getAllPendingBooks();
+        return ResponseData.<List<BookResponse>>builder()
+                .code(200)
+                .message("All pending book requests retrieved successfully")
+                .data(pendingBooks)
+                .build();
+    }
+    @DeleteMapping("/delete/{bookId}")
+    public void deleteBook(@PathVariable int bookId) {
+        bookService.deleteBook(bookId);
     }
 }
 

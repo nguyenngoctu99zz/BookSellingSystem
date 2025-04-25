@@ -12,6 +12,6 @@ public interface UserService {
     List<UserResponse> getAllUsers();
     UserResponse getUserById(int userId);
     void deleteUser(int userId);
-    void softDeleteUser(int userId);
+    UserResponse changeUserStatus(int userId, boolean isActive);
     Integer getCurrentUserId();
 }

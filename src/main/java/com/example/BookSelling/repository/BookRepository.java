@@ -12,7 +12,7 @@ public interface BookRepository extends JpaRepository<Book, Integer> {
     List<Book> findByUserUserIdAndIsApprovedFalse(Integer userId);
     @Query(value = "SELECT * FROM books b WHERE b.is_active = true AND b.is_approved = true ORDER BY b.book_id DESC LIMIT ?1 OFFSET ?2",
             nativeQuery = true)
-    public List<Book> getBookByNewest(int numberOfBook, int offset);
+    List<Book> getBookByNewest(int numberOfBook, int offset);
     @Query(value = "SELECT b.* FROM books b " +
             "LEFT JOIN reviews r ON b.book_id = r.book_id " +
             "WHERE b.is_active = true AND b.is_approved = true " +
@@ -20,10 +20,10 @@ public interface BookRepository extends JpaRepository<Book, Integer> {
             "ORDER BY COALESCE(AVG(r.ratings), 0) DESC, COUNT(r.book_id) DESC " +
             "LIMIT ?1 OFFSET ?2",
             nativeQuery = true)
-    public List<Book> getBookByBestReview(int numberOfBook, int offset);
+    List<Book> getBookByBestReview(int numberOfBook, int offset);
     @Query(value = "SELECT * FROM books b WHERE b.is_active = true AND b.is_approved = true ORDER BY b.discount_percentage DESC LIMIT ?1 OFFSET ?2",
             nativeQuery = true)
-    public List<Book> getBookByBestDiscount(int numberOfBook, int offset);
+    List<Book> getBookByBestDiscount(int numberOfBook, int offset);
     @Query(value = "SELECT b.*, " +
             "(MATCH(b.book_title) AGAINST(?1 IN BOOLEAN MODE) * 3 + " +
             "MATCH(b.author) AGAINST(?1 IN BOOLEAN MODE) * 2 + " +
@@ -40,10 +40,12 @@ public interface BookRepository extends JpaRepository<Book, Integer> {
             "   AND b.is_active = true " +
             "   AND b.is_approved = true " +
             "ORDER BY relevance_score DESC", nativeQuery = true)
- public List<Book> searchBookByKeyWord(String keyword);
+    List<Book> searchBookByKeyWord(String keyword);
     //run in sql before test search:
     //ALTER TABLE books ADD FULLTEXT (author,book_title, description);
     //ALTER TABLE books ADD FULLTEXT (author);
     //ALTER TABLE books ADD FULLTEXT (book_title);
     //ALTER TABLE books ADD FULLTEXT (description);
+    // BookRepository.java
+    List<Book> findByIsApprovedFalse();
 }

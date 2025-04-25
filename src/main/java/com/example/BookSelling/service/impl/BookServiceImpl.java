@@ -146,6 +146,14 @@ public class BookServiceImpl implements BookService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    @PreAuthorize("hasRole('ADMIN')")
+    public List<BookResponse> getAllPendingBooks() {
+        List<Book> books = bookRepository.findByIsApprovedFalse();
+        return books.stream()
+                .map(this::mapToBookResponse)
+                .collect(Collectors.toList());
+    }
 
     @Override
     public List<Book> getNewestBookInPage(int pageNumber, int numberOfBookEachPage){
@@ -201,7 +209,7 @@ public class BookServiceImpl implements BookService {
     @Override
     public BookResponse approveBook(Integer bookId, Integer adminId) {
         User admin = userRepository.findById(adminId)
-                .orElseThrow(() -> new AppException(ErrorCode.UNAUTHORIZED));
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
         if (!admin.getUserRole().equals(UserRole.ADMIN)) {
             throw new AppException(ErrorCode.UNAUTHORIZED);
@@ -215,6 +223,29 @@ public class BookServiceImpl implements BookService {
 
         Book approvedBook = bookRepository.save(book);
         return mapToBookResponse(approvedBook);
+    }
+    @Override
+    @PreAuthorize("hasRole('ADMIN')")
+    public BookResponse rejectBook(Integer bookId, Integer adminId) {
+        User admin = userRepository.findById(adminId)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+
+        if (!admin.getUserRole().equals(UserRole.ADMIN)) {
+            throw new AppException(ErrorCode.UNAUTHORIZED);
+        }
+
+        Book book = bookRepository.findById(bookId)
+                .orElseThrow(() -> new AppException(ErrorCode.BOOK_NOT_FOUND));
+
+        bookRepository.delete(book);
+        return mapToBookResponse(book);
+    }
+    @Override
+    @PreAuthorize("hasRole('ADMIN')")
+    public void deleteBook(Integer bookId) {
+        var book = bookRepository.findById(bookId)
+                .orElseThrow(() -> new AppException(ErrorCode.BOOK_NOT_FOUND));
+        bookRepository.delete(book);
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'SELLER')")

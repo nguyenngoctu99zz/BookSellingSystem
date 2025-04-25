@@ -1,5 +1,6 @@
 package com.example.BookSelling.service.impl;
 
+import com.example.BookSelling.common.UserRole;
 import com.example.BookSelling.dto.request.ReviewRequest;
 import com.example.BookSelling.dto.request.ReviewUpdateRequest;
 import com.example.BookSelling.dto.response.BookReviewResponse;
@@ -16,6 +17,8 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -37,6 +40,10 @@ public class ReviewServiceImpl implements ReviewService {
                 .orElseThrow(()-> new AppException(ErrorCode.USER_NOT_FOUND));
         var book = bookRepository.findById(request.getBookId())
                 .orElseThrow(()-> new AppException(ErrorCode.BOOK_NOT_FOUND));
+        boolean alreadyReviewed = reviewRepository.existsByUserAndBook(user, book);
+        if (alreadyReviewed) {
+            throw new AppException(ErrorCode.REVIEW_ALREADY_EXISTS);
+        }
         Review review = Review.builder()
                 .user(user)
                 .book(book)
@@ -84,16 +91,19 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
-    @PreAuthorize("hasRole('ADMIN')")
     public void deleteReview(int reviewId) {
         var review = reviewRepository.findById(reviewId)
-                .orElseThrow(()-> new AppException(ErrorCode.REVIEW_NOT_FOUND));
+                .orElseThrow(() -> new AppException(ErrorCode.REVIEW_NOT_FOUND));
         var user = userService.getCurrentUserId();
-        if(!review.getUser().getUserId().equals(user)){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentUserRole = authentication.getAuthorities().toString();
+        if (!currentUserRole.contains("ROLE_ADMIN") && !review.getUser().getUserId().equals(user)) {
             throw new AppException(ErrorCode.UNAUTHORIZED);
         }
+
         reviewRepository.deleteById(reviewId);
     }
+
 
     @Override
     public BookReviewResponse getReviewsByBookId(Integer bookId) {

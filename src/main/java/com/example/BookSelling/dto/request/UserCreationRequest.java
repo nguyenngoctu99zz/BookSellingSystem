@@ -19,7 +19,7 @@ public class UserCreationRequest {
     String fullName;
     String phoneNumber;
     String email;
-    MultipartFile userImage;
+    String userImage;
     LocalDateTime createdAt;
     boolean isActive;
     UserRole userRole;

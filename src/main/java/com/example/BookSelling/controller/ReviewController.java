@@ -57,4 +57,8 @@ public class ReviewController {
     public ReviewResponse updateReview(@PathVariable int reviewId, @RequestBody ReviewUpdateRequest request) {
         return reviewService.updateReview(reviewId, request);
     }
+    @DeleteMapping("/book/{reviewId}")
+    public void deleteReview(@PathVariable int reviewId) {
+        reviewService.deleteReview(reviewId);
+    }
 }

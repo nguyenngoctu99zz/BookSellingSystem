@@ -42,10 +42,10 @@ public class UserServiceImpl implements UserService {
     public UserResponse createUser(UserCreationRequest request) {
         var role = (request.getUserRole() != null) ?
                 request.getUserRole() : UserRole.USER;
-        String imageName = null;
-        if (request.getUserImage() != null && !request.getUserImage().isEmpty()) {
-            imageName = imageService.uploadImage(request.getUserImage(), null);
-        }
+//        String imageName = null;
+//        if (request.getUserImage() != null && !request.getUserImage().isEmpty()) {
+//            imageName = imageService.uploadImage(request.getUserImage(), null);
+//        }
         User user = User.builder()
                 .username(request.getUsername())
                 .password(passwordEncoder.encode(request.getPassword()))
@@ -53,7 +53,7 @@ public class UserServiceImpl implements UserService {
                 .email(request.getEmail())
                 .phoneNumber(request.getPhoneNumber())
                 .createdAt(LocalDateTime.now())
-                .userImage(imageName)
+                .userImage(request.getUserImage())
                 .userRole(role)
                 .isActive(true)
                 .build();
@@ -103,6 +103,8 @@ public class UserServiceImpl implements UserService {
         user.setPhoneNumber(request.getPhoneNumber());
         user.setUserImage(imageName);
         user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setUserRole(request.getUserRole());
+        user.setActive(request.isActive());
         userRepository.save(user);
 
         return UserResponse.builder()
@@ -132,7 +134,7 @@ public class UserServiceImpl implements UserService {
                         .createdAt(LocalDateTime.now())
                         .userImage(user.getUserImage())
                         .userRole(user.getUserRole())
-                        .isActive(true)
+                        .isActive(user.isActive())
                         .build())
                 .toList();
     }
@@ -151,7 +153,7 @@ public class UserServiceImpl implements UserService {
                 .createdAt(LocalDateTime.now())
                 .userImage(user.getUserImage())
                 .userRole(user.getUserRole())
-                .isActive(true)
+                .isActive(user.isActive())
                 .build();
     }
 
@@ -167,10 +169,23 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @PreAuthorize("hasRole('ADMIN')")
-    public void softDeleteUser(int userId) {
+    @Transactional
+    public UserResponse changeUserStatus(int userId, boolean isActive) {
         var user = userRepository.findById(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
-        user.setActive(false);
+        user.setActive(isActive);
+        var updateUser = userRepository.save(user);
+        return UserResponse.builder()
+                .userId(updateUser.getUserId())
+                .username(updateUser.getUsername())
+                .fullName(updateUser.getFullName())
+                .email(updateUser.getEmail())
+                .phoneNumber(updateUser.getPhoneNumber())
+                .createdAt(LocalDateTime.now())
+                .userImage(user.getUserImage())
+                .userRole(user.getUserRole())
+                .isActive(updateUser.isActive())
+                .build();
     }
 
     @Override

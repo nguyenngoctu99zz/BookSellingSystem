@@ -22,7 +22,9 @@ public interface BookService {
     List<BookResponse> getMyRequestBooks(Integer userId);
     void deleteRequestBook(Integer userId, Integer bookId);
     BookResponse approveBook(Integer bookId, Integer userId);
-
+    void deleteBook(Integer bookId);
+    List<BookResponse> getAllPendingBooks();
+    BookResponse rejectBook(Integer bookId, Integer adminId);
 
 
     List<Book> getNewestBookInPage(int pageNumber, int numberOfBookEachPage);

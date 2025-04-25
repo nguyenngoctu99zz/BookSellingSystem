@@ -19,8 +19,8 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class UserController {
     UserService userService;
-    @PostMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public UserResponse createUser(@ModelAttribute UserCreationRequest request){
+    @PostMapping("")
+    public UserResponse createUser(@RequestBody UserCreationRequest request){
         return userService.createUser(request);
     }
 
@@ -54,8 +54,12 @@ public class UserController {
     public void deleteUser(@PathVariable int userId){
         userService.deleteUser(userId);
     }
-    @DeleteMapping("disable/{userId}")
-    public void softDeleteUser(@PathVariable int userId){
-        userService.softDeleteUser(userId);
+    @PutMapping("status/{userId}")
+    public ResponseData<UserResponse> changeUserStatus(@PathVariable int userId, @RequestParam boolean isActive){
+        return ResponseData.<UserResponse>builder()
+                .code(200)
+                .message("User status changed")
+                .data(userService.changeUserStatus(userId, isActive))
+                .build();
     }
 }
