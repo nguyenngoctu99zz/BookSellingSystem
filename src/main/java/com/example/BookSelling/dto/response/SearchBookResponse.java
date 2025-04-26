@@ -12,6 +12,6 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class SearchBookResponse {
-    public List<Book> books;
+    public List<ResponseData> books;
     public int totalNumber;
 }

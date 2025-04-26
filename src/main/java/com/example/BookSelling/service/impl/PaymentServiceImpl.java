@@ -5,6 +5,8 @@ import com.example.BookSelling.common.PaymentMethod;
 import com.example.BookSelling.common.PaymentStatus;
 import com.example.BookSelling.dto.request.PaymentSubmitRequest;
 import com.example.BookSelling.dto.response.PaymentResponse;
+import com.example.BookSelling.exception.AppException;
+import com.example.BookSelling.exception.ErrorCode;
 import com.example.BookSelling.model.Book;
 import com.example.BookSelling.model.OrderItem;
 import com.example.BookSelling.model.Payment;
@@ -40,8 +42,12 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     public ResponseEntity<PaymentResponse> paymentHandler(PaymentSubmitRequest paymentSubmitRequest, HttpServletRequest request) {
         String orderInfo = paymentSubmitRequest.getOrderInfo();
+        Book book = bookRepository.findById(Integer.parseInt(orderInfo.split(",")[1].split(":")[1])).get();
+        if (book.getUser().getUserId().equals(Integer.parseInt(orderInfo.split(",")[0].split(":")[1]))) {
+            throw new AppException(ErrorCode.ORDER_INVALID);
+        }
         if(paymentSubmitRequest.getPaymentMethod() == PaymentMethod.COD){
-            Book book = bookRepository.findById(Integer.parseInt(orderInfo.split(",")[1].split(":")[1])).get();
+
             Payment payment = Payment.builder().paymentAmount(paymentSubmitRequest.getAmount())
                     .paymentMethod(PaymentMethod.COD)
                     .paymentStatus(PaymentStatus.PENDING)

@@ -21,7 +21,8 @@ public enum ErrorCode {
     UNAUTHENTICATED(1013, "Unauthenticated", HttpStatus.UNAUTHORIZED),
     UNAUTHORIZED(1014, "You do not have permission", HttpStatus.FORBIDDEN),
     USER_INACTIVE(1015, "Account is locked", HttpStatus.FORBIDDEN),
-
+    ORDER_INVALID(1016, "You can not buy your book", HttpStatus.BAD_REQUEST),
+    CART_INVALID(1017, "You can not add to cart your book", HttpStatus.BAD_REQUEST),
     ;
     private final int errorCode;
     private final String errorMessage;
