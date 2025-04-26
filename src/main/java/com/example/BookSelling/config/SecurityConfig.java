@@ -38,7 +38,8 @@ public class SecurityConfig {
             "/reviews/**",
             "/image/**",
             "/book/**",
-            "/search/**"
+            "/search/**",
+            "/categories"
     };
 
     @Value("${jwt.signer-key}")

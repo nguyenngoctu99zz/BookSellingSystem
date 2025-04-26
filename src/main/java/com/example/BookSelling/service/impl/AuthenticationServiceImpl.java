@@ -59,6 +59,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new AppException(ErrorCode.UNAUTHENTICATED);
         }
+        if (!user.isActive()) {
+            throw new AppException(ErrorCode.USER_INACTIVE);
+        }
         var token = generateToken(user);
         return AuthenticationResponse.builder()
                 .userId(user.getUserId())

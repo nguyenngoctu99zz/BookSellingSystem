@@ -21,4 +21,5 @@ public class BookRequest {
     String description;
     String publishDate;
     MultipartFile bookImage;
+    List<Integer> categoryIds;
 }

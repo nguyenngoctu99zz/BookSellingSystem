@@ -3,6 +3,7 @@ package com.example.BookSelling.repository;
 import com.example.BookSelling.model.Book;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
@@ -47,5 +48,11 @@ public interface BookRepository extends JpaRepository<Book, Integer> {
     //ALTER TABLE books ADD FULLTEXT (book_title);
     //ALTER TABLE books ADD FULLTEXT (description);
     // BookRepository.java
-    List<Book> findByIsApprovedFalse();
+    List<Book> findByIsApprovedFalse()
+    ;
+    @Query("SELECT DISTINCT b FROM Book b " +
+            "JOIN BookCategory bc ON b.bookId = bc.book.bookId " +
+            "WHERE (:categoryIds IS NULL OR bc.category.categoryID IN :categoryIds)")
+    List<Book> findBooksByCategoryIds(@Param("categoryIds") List<Integer> categoryIds);
+
 }

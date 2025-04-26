@@ -43,10 +43,6 @@ public class UserServiceImpl implements UserService {
     public UserResponse createUser(UserCreationRequest request) {
         var role = (request.getUserRole() != null) ?
                 request.getUserRole() : UserRole.USER;
-//        String imageName = null;
-//        if (request.getUserImage() != null && !request.getUserImage().isEmpty()) {
-//            imageName = imageService.uploadImage(request.getUserImage(), null);
-//        }
         User user = User.builder()
                 .username(request.getUsername())
                 .password(passwordEncoder.encode(request.getPassword()))

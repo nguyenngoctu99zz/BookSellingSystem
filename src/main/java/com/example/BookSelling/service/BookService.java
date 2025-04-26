@@ -25,7 +25,7 @@ public interface BookService {
     void deleteBook(Integer bookId);
     List<BookResponse> getAllPendingBooks();
     BookResponse rejectBook(Integer bookId, Integer adminId);
-
+    List<BookResponse> filterBooksByCategories(List<Integer> categoryIds);
 
     List<Book> getNewestBookInPage(int pageNumber, int numberOfBookEachPage);
     NewBookByPageResponse newBookPageHandler(int pageNumber, int numberOfBookEachPage);

@@ -20,6 +20,8 @@ public enum ErrorCode {
     PASSWORD_INVALID(1012, "Password must be at least 6 characters", HttpStatus.BAD_REQUEST),
     UNAUTHENTICATED(1013, "Unauthenticated", HttpStatus.UNAUTHORIZED),
     UNAUTHORIZED(1014, "You do not have permission", HttpStatus.FORBIDDEN),
+    USER_INACTIVE(1015, "Account is locked", HttpStatus.FORBIDDEN),
+
     ;
     private final int errorCode;
     private final String errorMessage;

@@ -3,6 +3,7 @@ package com.example.BookSelling.service.impl;
 import com.example.BookSelling.common.UserRole;
 import com.example.BookSelling.dto.request.BookRequest;
 
+import com.example.BookSelling.dto.response.CategoryResponse;
 import com.example.BookSelling.dto.response.NewBookByPageResponse;
 import com.example.BookSelling.dto.response.SearchBookResponse;
 
@@ -11,8 +12,12 @@ import com.example.BookSelling.dto.response.BookResponse;
 import com.example.BookSelling.exception.AppException;
 import com.example.BookSelling.exception.ErrorCode;
 import com.example.BookSelling.model.Book;
+import com.example.BookSelling.model.BookCategory;
+import com.example.BookSelling.model.Category;
 import com.example.BookSelling.model.User;
+import com.example.BookSelling.repository.BookCategoryRepository;
 import com.example.BookSelling.repository.BookRepository;
+import com.example.BookSelling.repository.CategoryRepository;
 import com.example.BookSelling.repository.UserRepository;
 import com.example.BookSelling.service.BookService;
 import com.example.BookSelling.service.ImageService;
@@ -41,6 +46,8 @@ public class BookServiceImpl implements BookService {
     BookRepository bookRepository;
     UserRepository userRepository;
     ImageService imageService;
+    CategoryRepository categoryRepository;
+    BookCategoryRepository bookCategoryRepository;
 
     @PreAuthorize("hasAnyRole('ADMIN', 'SELLER')")
     @Override
@@ -68,6 +75,19 @@ public class BookServiceImpl implements BookService {
                 .build();
 
         Book savedBook = bookRepository.save(book);
+        if (request.getCategoryIds() != null && !request.getCategoryIds().isEmpty()) {
+            List<BookCategory> bookCategories = request.getCategoryIds().stream()
+                    .map(catId -> {
+                        Category category = categoryRepository.findById(catId)
+                                .orElseThrow(() -> new RuntimeException("Category not found with ID: " + catId));
+                        return BookCategory.builder()
+                                .book(savedBook)
+                                .category(category)
+                                .build();
+                    })
+                    .toList();
+            bookCategoryRepository.saveAll(bookCategories);
+        }
         return mapToBookResponse(savedBook);
     }
 
@@ -266,8 +286,23 @@ public class BookServiceImpl implements BookService {
         bookRepository.delete(book);
     }
 
+    public List<BookResponse> filterBooksByCategories(List<Integer> categoryIds) {
+        List<Book> books = bookRepository.findBooksByCategoryIds(categoryIds);
+        return books.stream().map(this::mapToBookResponse).toList();
+    }
 
     private BookResponse mapToBookResponse(Book book) {
+        List<CategoryResponse> categoryInfos = bookCategoryRepository.findByBook(book).stream()
+                .map(bc -> {
+                    Category c = bc.getCategory();
+                    return CategoryResponse.builder()
+                            .categoryId(c.getCategoryID())
+                            .categoryName(c.getCategoryName())
+                            .description(c.getDescription())
+                            .build();
+                })
+                .toList();
+
         return BookResponse.builder()
                 .bookId(book.getBookId())
                 .bookTitle(book.getBookTitle())
@@ -283,8 +318,7 @@ public class BookServiceImpl implements BookService {
                 .isApproved(book.isApproved())
                 .sellerId(book.getUser() != null ? book.getUser().getUserId() : null)
                 .discountPercentage(book.getDiscountPercentage())
-//                .storeId(book.getStore() != null ? book.getStore().getStoreId() : null)
-//                .wishListId(book.getWishList() != null ? book.getWishList().getWishListId() : null)
+                .categories(categoryInfos)
                 .build();
 
     }

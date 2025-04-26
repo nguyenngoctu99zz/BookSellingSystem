@@ -53,4 +53,14 @@ public class BookController {
                 .data(book)
                 .build();
     }
+    @PostMapping("/filter-by-categories")
+    public ResponseData<?> filterByCategories(@RequestBody List<Integer> categoryIds) {
+        List<BookResponse> result = bookService.filterBooksByCategories(categoryIds);
+        return ResponseData.builder()
+                .code(200)
+                .message("Success")
+                .data(result)
+                .build();
+    }
+
 }
