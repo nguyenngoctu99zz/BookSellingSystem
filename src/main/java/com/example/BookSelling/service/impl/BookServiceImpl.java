@@ -223,7 +223,10 @@ public class BookServiceImpl implements BookService {
     @Override
     public SearchBookResponse searchBookHandler(String keyword) {
         List<Book> books = bookRepository.searchBookByKeyWord(keyword);
-        return new SearchBookResponse(books, books.size());
+        List bookResponse = books.stream()
+                .map(this::mapToBookResponse)
+                .collect(Collectors.toList());
+        return new SearchBookResponse(bookResponse, books.size());
     }
     @PreAuthorize("hasRole('ADMIN')")
     @Override
