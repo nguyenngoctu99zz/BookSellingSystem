@@ -53,6 +53,11 @@ public class OrderServiceImpl implements OrderService {
         Book book = bookRepository.findById(request.getBookId())
                 .orElseThrow(() -> new AppException(ErrorCode.BOOK_NOT_FOUND));
 
+
+        if (book.getUser().getUserId().equals(userId)) {
+            throw new AppException(ErrorCode.ORDER_INVALID);
+        }
+
         if (book.getQuantity() < request.getQuantity()) {
             throw new AppException("Not enough quantity available");
         }

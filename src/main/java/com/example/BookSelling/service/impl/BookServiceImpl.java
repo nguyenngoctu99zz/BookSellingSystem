@@ -116,6 +116,7 @@ public class BookServiceImpl implements BookService {
         existingBook.setQuantity(request.getQuantity());
         existingBook.setPrice(request.getPrice());
         existingBook.setBookImage(imageName);
+        existingBook.setDiscountPercentage(request.getDiscountPercentage());
         existingBook.setDescription(request.getDescription());
         existingBook.setPublishDate(request.getPublishDate());
 
