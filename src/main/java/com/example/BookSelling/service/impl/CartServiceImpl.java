@@ -61,6 +61,10 @@ public class CartServiceImpl implements CartService {
         Book book = bookRepository.findById(request.getBookId())
                 .orElseThrow(() -> new AppException(ErrorCode.BOOK_NOT_FOUND));
 
+        if (book.getUser().getUserId().equals(userId)) {
+            throw new AppException(ErrorCode.CART_INVALID);
+        }
+
         Optional<CartItem> existingCartItemOpt = cartItemRepository.findByUserAndBook(user, book);
 
         if (existingCartItemOpt.isPresent()) {

@@ -39,6 +39,4 @@ public class Book {
     @JoinColumn(name = "sellerId")
     User user;
 
-
-
 }
