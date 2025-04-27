@@ -45,17 +45,17 @@ public class ManageBookController {
                 .build();
     }
 
-    @PatchMapping("/{bookId}/status")
-    public ResponseData<BookResponse> changeBookStatus(
-            @PathVariable Integer bookId,
-            @RequestParam boolean isActive) {
-        BookResponse book = bookService.changeBookStatus(bookId, isActive);
-        return ResponseData.<BookResponse>builder()
-                .code(200)
-                .message("Book status changed successfully")
-                .data(book)
-                .build();
-    }
+//    @PatchMapping("/{bookId}/status")
+//    public ResponseData<BookResponse> changeBookStatus(
+//            @PathVariable Integer bookId,
+//            @RequestParam boolean isActive) {
+//        BookResponse book = bookService.changeBookStatus(bookId, isActive);
+//        return ResponseData.<BookResponse>builder()
+//                .code(200)
+//                .message("Book status changed successfully")
+//                .data(book)
+//                .build();
+//    }
 
 //    @GetMapping
 //    public ResponseData<List<BookResponse>> getAllBooks() {
