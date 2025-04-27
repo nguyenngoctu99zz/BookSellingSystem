@@ -19,17 +19,23 @@ import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.StringJoiner;
 import java.util.UUID;
@@ -62,24 +68,33 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         if (!user.isActive()) {
             throw new AppException(ErrorCode.USER_INACTIVE);
         }
-        var token = generateToken(user);
+        var accessToken = generateAccessToken(user);
+        var refreshToken = generateRefreshToken(user);
+
         return AuthenticationResponse.builder()
                 .userId(user.getUserId())
-                .token(token)
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
                 .authenticated(true)
                 .build();
     }
+    public String generateAccessToken(User user) {
+        return generateToken(user, VALID_DURATION, "ACCESS");
+    }
 
-    public String generateToken(User user) {
+    public String generateRefreshToken(User user) {
+        return generateToken(user, REFRESH_DURATION, "REFRESH");
+    }
+    public String generateToken(User user, long durationSeconds, String tokenType) {
         JWSHeader jwsHeader = new JWSHeader(JWSAlgorithm.HS512);
         JWTClaimsSet jwtClaimsSet =new JWTClaimsSet.Builder()
                 .subject(user.getUsername())
                 .issuer("My domain") //website's domain
                 .issueTime(new Date())
                 .expirationTime(new Date(Instant.now()
-                        .plus(VALID_DURATION, ChronoUnit.SECONDS)
-                        .toEpochMilli()))
+                        .plus(durationSeconds, ChronoUnit.SECONDS).toEpochMilli()))
                 .jwtID(UUID.randomUUID().toString())
+                .claim("type", tokenType)
                 .claim("roles", buildRole(user))
                 .claim("userId", user.getUserId())
                 .build();
@@ -118,8 +133,22 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         return LogoutResponse.builder().logout(true).build();
     }
     @Override
-    public RefreshResponse refreshToken(RefreshRequest request) throws ParseException, JOSEException {
-        var signJWT = verifyToken(request.getToken());
+    public RefreshResponse refreshToken(HttpServletRequest request, HttpServletResponse response) throws ParseException, JOSEException {
+        Cookie[] cookies = request.getCookies();
+        if (cookies == null) {
+            throw new AppException(ErrorCode.UNAUTHENTICATED);
+        }
+
+        String refreshToken = Arrays.stream(cookies)
+                .filter(c -> "refreshToken".equals(c.getName()))
+                .findFirst()
+                .map(Cookie::getValue)
+                .orElseThrow(() -> new AppException(ErrorCode.UNAUTHENTICATED));
+        var signJWT = verifyToken(refreshToken);
+        String tokenType = signJWT.getJWTClaimsSet().getStringClaim("type");
+        if (!"REFRESH".equals(tokenType)) {
+            throw new AppException(ErrorCode.UNAUTHENTICATED);
+        }
         String jti = signJWT.getJWTClaimsSet().getJWTID();
         var expiryTime = signJWT.getJWTClaimsSet().getExpirationTime();
         String username = signJWT.getJWTClaimsSet().getSubject();
@@ -131,12 +160,22 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .expiryTime(expiryTime)
                 .user(user)
                 .build();
-
         invalidatedTokenRepository.save(invalidatedToken);
 
-        var token = generateToken(user);
+        String newAccessToken = generateAccessToken(user);
+        String newRefreshToken = generateRefreshToken(user);
+        ResponseCookie cookie = ResponseCookie.from("refreshToken", newRefreshToken)
+                .httpOnly(true)
+                .secure(false)
+                .path("/")
+                .maxAge(REFRESH_DURATION)
+                .sameSite("Strict")
+                .build();
+
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
         return RefreshResponse.builder()
-                .newToken(token)
+                .newAccessToken(newAccessToken)
+                .newRefreshToken(newRefreshToken)
                 .authenticated(true)
                 .build();
     }

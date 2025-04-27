@@ -2,13 +2,14 @@ package com.example.BookSelling.controller;
 
 import com.example.BookSelling.dto.request.AuthenticationRequest;
 import com.example.BookSelling.dto.request.LogoutRequest;
-import com.example.BookSelling.dto.request.RefreshRequest;
 import com.example.BookSelling.dto.response.AuthenticationResponse;
 import com.example.BookSelling.dto.response.LogoutResponse;
 import com.example.BookSelling.dto.response.RefreshResponse;
 import com.example.BookSelling.dto.response.ResponseData;
 import com.example.BookSelling.service.AuthenticationService;
 import com.nimbusds.jose.JOSEException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -43,10 +44,10 @@ public class AuthenticationController {
     }
 
     @PostMapping("refresh")
-    ResponseData<RefreshResponse> refresh(@RequestBody RefreshRequest request)
+    ResponseData<RefreshResponse> refresh( HttpServletRequest request, HttpServletResponse response)
             throws JOSEException, ParseException {
         return ResponseData.<RefreshResponse>builder()
-                .data(authenticationService.refreshToken(request))
+                .data(authenticationService.refreshToken(request, response))
                 .build();
     }
 

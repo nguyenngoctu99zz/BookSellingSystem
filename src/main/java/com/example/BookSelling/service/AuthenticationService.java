@@ -8,12 +8,14 @@ import com.example.BookSelling.dto.response.LogoutResponse;
 import com.example.BookSelling.dto.response.RefreshResponse;
 import com.example.BookSelling.model.User;
 import com.nimbusds.jose.JOSEException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import java.text.ParseException;
 
 public interface AuthenticationService {
     AuthenticationResponse authenticate(AuthenticationRequest request);
-    String generateToken(User user);
+    String generateToken(User user, long durationSeconds, String tokenType);
     LogoutResponse logout(LogoutRequest request) throws ParseException, JOSEException;
-    RefreshResponse refreshToken(RefreshRequest request) throws ParseException, JOSEException;
+    RefreshResponse refreshToken(HttpServletRequest request, HttpServletResponse response) throws ParseException, JOSEException;
 }
