@@ -53,6 +53,7 @@ public class AdminBookController {
     public void deleteBook(@PathVariable int bookId) {
         bookService.deleteBook(bookId);
     }
+
     @PatchMapping("/{bookId}/status")
     public ResponseData<BookResponse> changeBookStatus(
             @PathVariable Integer bookId,
